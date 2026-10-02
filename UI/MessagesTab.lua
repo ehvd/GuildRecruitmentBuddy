@@ -6,6 +6,9 @@ local Messages = GRB.Messages
 
 local DELETE_POPUP = "GUILDRECRUITMENTBUDDY_DELETE_MESSAGE"
 
+local Broadcast = GRB.Broadcast
+
+local ticker      -- repeating timer that keeps the broadcast status line current
 local ui          -- widgets of the currently shown tab, nil when the tab is not shown
 local selectedId  -- id of the message being edited
 
@@ -110,6 +113,31 @@ local function Build(container)
 
     scroll:AddChild(Label(L["Placeholders: {name} {class} {level} {guild} {discord}"]))
 
+    -- Interval broadcasting (channel messages) -------------------------------
+    scroll:AddChild(Heading(L["Interval broadcasting"]))
+
+    local channelBox = AceGUI:Create("EditBox")
+    channelBox:SetLabel(L["Channel"])
+    channelBox:SetRelativeWidth(0.34)
+    channelBox:DisableButton(true)
+    scroll:AddChild(channelBox)
+
+    local intervalSlider = AceGUI:Create("Slider")
+    intervalSlider:SetLabel(L["Every (minutes)"])
+    intervalSlider:SetSliderValues(1, Messages.MAX_INTERVAL, 1)
+    intervalSlider:SetRelativeWidth(0.4)
+    scroll:AddChild(intervalSlider)
+
+    local broadcastBox = AceGUI:Create("CheckBox")
+    broadcastBox:SetLabel(L["Broadcast"])
+    broadcastBox:SetRelativeWidth(0.24)
+    scroll:AddChild(broadcastBox)
+
+    local joinedNames = GRB.Broadcast:GetJoinedChannels()
+    scroll:AddChild(Label(format(L["Joined channels: %s"], #joinedNames > 0 and table.concat(joinedNames, ", ") or L["none"])))
+    local broadcastStatus = Label()
+    scroll:AddChild(broadcastStatus)
+
     -- Preview --------------------------------------------------------------
     scroll:AddChild(Heading(L["Preview"]))
     local counter = Label()
@@ -131,7 +159,9 @@ local function Build(container)
             return
         end
 
-        local result = Messages:Validate(msg.text, Messages:GetSampleContext())
+        -- Channel messages have no recipient, so {name} {class} {level} stay unresolved and are flagged
+        local ctx = msg.target == "channel" and Messages:GetBaseContext() or Messages:GetSampleContext()
+        local result = Messages:Validate(msg.text, ctx)
         local color = result.ok and "|cff40ff40" or "|cffff4040"
         counter:SetText(format("%s%d / %d|r", color, result.length, Messages.MAX_LENGTH))
 
@@ -149,6 +179,31 @@ local function Build(container)
         preview:SetText(result.rendered)
         -- Labels start with zero height; re-layout so the rows below move down
         scroll:DoLayout()
+    end
+
+    local lastStatus
+
+    -- Runs every second (ticker), so only re-layout when the text changed
+    function widgets.RefreshBroadcastStatus()
+        local text = Broadcast:GetStatusText(selectedId)
+        if text ~= lastStatus then
+            lastStatus = text
+            broadcastStatus:SetText(text)
+            scroll:DoLayout()
+        end
+    end
+
+    function widgets.RefreshBroadcastFields()
+        local msg = Messages:Get(selectedId)
+        local isChannel = msg ~= nil and msg.target == "channel"
+        channelBox:SetDisabled(not isChannel)
+        intervalSlider:SetDisabled(not isChannel)
+        broadcastBox:SetDisabled(not isChannel)
+        channelBox:SetText(msg and msg.channel or "")
+        intervalSlider:SetValue(msg and msg.interval or Messages.DEFAULT_INTERVAL)
+        broadcastBox:SetValue(msg ~= nil and msg.broadcast == true)
+        lastStatus = nil
+        widgets.RefreshBroadcastStatus()
     end
 
     function widgets.RefreshList()
@@ -177,6 +232,7 @@ local function Build(container)
         nameBox:SetText(msg and msg.name or "")
         targetDropdown:SetValue(msg and msg.target or nil)
         textBox:SetText(msg and msg.text or "")
+        widgets.RefreshBroadcastFields()
         UpdatePreview()
     end
 
@@ -188,7 +244,23 @@ local function Build(container)
         if Messages:Update(selectedId, { name = value }) then widgets.RefreshList() end
     end)
     targetDropdown:SetCallback("OnValueChanged", function(_, _, value)
-        if Messages:Update(selectedId, { target = value }) then widgets.RefreshList() end
+        if Messages:Update(selectedId, { target = value }) then
+            widgets.RefreshList()
+            widgets.RefreshBroadcastFields()
+            UpdatePreview()
+        end
+    end)
+    channelBox:SetCallback("OnTextChanged", function(_, _, value)
+        Messages:Update(selectedId, { channel = value })
+    end)
+    intervalSlider:SetCallback("OnValueChanged", function(_, _, value)
+        Messages:Update(selectedId, { interval = value })
+    end)
+    broadcastBox:SetCallback("OnValueChanged", function(_, _, value)
+        if Messages:Update(selectedId, { broadcast = value }) then
+            lastStatus = nil
+            widgets.RefreshBroadcastStatus()
+        end
     end)
     textBox:SetCallback("OnTextChanged", function(_, _, value)
         if Messages:Update(selectedId, { text = value }) then UpdatePreview() end
@@ -196,10 +268,15 @@ local function Build(container)
 
     widgets.RefreshList()
     widgets.RefreshEditor()
+    ticker = GRB:ScheduleRepeatingTimer(function() widgets.RefreshBroadcastStatus() end, 1)
 end
 
 local function Cleanup()
     ui = nil
+    if ticker then
+        GRB:CancelTimer(ticker)
+        ticker = nil
+    end
 end
 
 GRB.MainFrame:RegisterTab("Messages", L["Messages"], Build, Cleanup)

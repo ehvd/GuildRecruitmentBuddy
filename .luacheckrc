@@ -16,6 +16,8 @@ globals = {
     "SLASH_GRB2",
     "SlashCmdList",
     "StaticPopupDialogs",
+    "BINDING_HEADER_GUILDRECRUITMENTBUDDY",
+    "BINDING_NAME_GUILDRECRUITMENTBUDDY_SEND",
     "GuildRecruitmentBuddyMainFrame",
     "UISpecialFrames",
 }
@@ -43,7 +45,7 @@ read_globals = {
     -- Game API
     "C_Timer", "C_FriendList", "C_GuildInfo", "C_ChatInfo",
     "SendChatMessage", "GetGuildInfo", "GetNumGuildMembers", "GetGuildRosterInfo",
-    "GuildRoster", "IsInGuild", "CanGuildInvite", "GuildInvite", "GetRealmName", "InterfaceOptionsFrame_OpenToCategory", "FriendsFrame", "GetPlayerInfoByGUID", "GetNormalizedRealmName", "UnitName",
+    "GuildRoster", "IsInGuild", "CanGuildInvite", "GuildInvite", "GetRealmName", "GetBindingKey", "UnitAffectingCombat", "InterfaceOptionsFrame_OpenToCategory", "FriendsFrame", "GetPlayerInfoByGUID", "GetNormalizedRealmName", "UnitName",
     "UnitLevel", "UnitClass", "UnitFactionGroup", "GetServerTime", "GetTime", "GetLocale",
     "IsInInstance", "InCombatLockdown", "UnitIsAFK", "GetNumGroupMembers", "IsInRaid",
     "GetChannelList", "GetChannelName", "Ambiguate", "FlashClientIcon", "RAID_CLASS_COLORS",

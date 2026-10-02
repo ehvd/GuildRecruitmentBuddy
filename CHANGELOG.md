@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- Interval channel broadcasting: per-message channel and interval; a timer marks messages as ready and a popup, sound and key binding (`/grb send`) let you send them with the click Blizzard requires. Pauses in instances, combat and while AFK. Off by default; `/grb broadcast on|off`, minimap menu or settings.
+
 ### Fixed
 - Overlapping text in the Messages tab preview (counter and warning labels) and the same label layout problem in the Contacts and Scanner tabs.
 

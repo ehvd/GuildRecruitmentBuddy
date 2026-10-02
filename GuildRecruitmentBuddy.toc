@@ -19,8 +19,10 @@ Modules\Contacts.lua
 Modules\Whisper.lua
 Modules\AutoInvite.lua
 Modules\Scanner.lua
+Modules\Broadcast.lua
 
 UI\InviteFrame.lua
+UI\BroadcastFrame.lua
 UI\MainFrame.lua
 UI\MessagesTab.lua
 UI\ScannerTab.lua

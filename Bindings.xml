@@ -1,0 +1,5 @@
+<Bindings>
+    <Binding name="GUILDRECRUITMENTBUDDY_SEND" header="GUILDRECRUITMENTBUDDY" category="ADDONS">
+        GuildRecruitmentBuddy.Broadcast:SendNext()
+    </Binding>
+</Bindings>
