@@ -25,7 +25,17 @@ local function ShowMenu()
         },
         { text = L["Settings"], notCheckable = true, func = function() GRB:OpenConfig() end },
     }
-    EasyMenu(menu, menuFrame, "cursor", 0, 0, "MENU")
+    -- EasyMenu was removed from the client; it only wrapped these UIDropDownMenu calls
+    UIDropDownMenu_Initialize(menuFrame, function(_, level)
+        for _, entry in ipairs(menu) do
+            local info = UIDropDownMenu_CreateInfo()
+            for key, value in pairs(entry) do
+                info[key] = value
+            end
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end, "MENU")
+    ToggleDropDownMenu(1, nil, menuFrame, "cursor", 0, 0)
 end
 
 local launcher = LDB:NewDataObject(ADDON_NAME, {

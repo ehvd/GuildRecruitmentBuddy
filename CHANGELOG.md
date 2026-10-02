@@ -10,6 +10,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 - Interval channel broadcasting: per-message channel and interval; a timer marks messages as ready and a popup, sound and key binding (`/grb send`) let you send them with the click Blizzard requires. Pauses in instances, combat and while AFK. Off by default; `/grb broadcast on|off`, minimap menu or settings.
 
 ### Fixed
+- Right-click menu of the minimap button raised a Lua error because `EasyMenu` no longer exists in the client.
 - Overlapping text in the Messages tab preview (counter and warning labels) and the same label layout problem in the Contacts and Scanner tabs.
 
 ### Changed
