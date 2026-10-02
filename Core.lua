@@ -15,6 +15,10 @@ local version = getMetadata(ADDON_NAME, "Version")
 GRB.version = (version and not version:find("@", 1, true)) and version or "dev"
 
 -- profile: settings (shared by all characters), global: contacts keyed by "Name-Realm"
+-- Key binding labels (Bindings.xml)
+BINDING_HEADER_GUILDRECRUITMENTBUDDY = L["ADDON_NAME"]
+BINDING_NAME_GUILDRECRUITMENTBUDDY_SEND = L["Send the ready channel broadcast"]
+
 local defaults = {
     profile = {
         minimap = { hide = false },
@@ -32,6 +36,13 @@ local defaults = {
             minLevel = 1,
             maxLevel = 60,
             zone = "",
+        },
+        broadcast = {
+            active = false,         -- master switch, off by default (/grb broadcast on|off)
+            sound = true,           -- sound when a broadcast becomes ready
+            pauseInInstance = true,
+            pauseInCombat = true,
+            pauseWhenAfk = true,
         },
         window = {},      -- main window position and size (managed by AceGUI)
         guildName = "",   -- overrides the detected guild name for {guild}
@@ -82,6 +93,8 @@ function GRB:PrintUsage()
     self:Print(L["/grb - open the main window"])
     self:Print(L["/grb invite on|off - toggle keyword auto invite"])
     self:Print(L["/grb scan - open the scanner"])
+    self:Print(L["/grb broadcast on|off - toggle interval broadcasting"])
+    self:Print(L["/grb send - send the ready channel broadcast"])
     self:Print(L["/grb config - open settings"])
     self:Print(L["/grb options - open the Blizzard options panel"])
 end
@@ -95,6 +108,10 @@ function GRB:HandleSlashCommand(input)
         self:ToggleMainWindow()
     elseif cmd == "invite" and (arg == "on" or arg == "off") then
         self:SetInviteEnabled(arg == "on")
+    elseif cmd == "broadcast" and (arg == "on" or arg == "off") then
+        self.Broadcast:SetActive(arg == "on")
+    elseif cmd == "send" then
+        self.Broadcast:SendNext()
     elseif cmd == "scan" then
         self:OpenScanner()
     elseif cmd == "config" or cmd == "settings" then

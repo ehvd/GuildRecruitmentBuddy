@@ -13,7 +13,7 @@ LUACHECK  ?= luacheck
 VERSION   ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 
 DEST          := $(ADDON_DIR)/$(ADDON)
-INSTALL_FILES := $(ADDON).toc embeds.xml Core.lua LICENSE Locales Modules UI Libs
+INSTALL_FILES := $(ADDON).toc embeds.xml Bindings.xml Core.lua LICENSE Locales Modules UI Libs
 
 # PowerShell snippets (the path comes in through the T / S environment variables to survive spaces)
 PS_EXIT_IF_LINK  = if ((Test-Path -LiteralPath $$env:T) -and ((Get-Item -LiteralPath $$env:T -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) { exit 1 }

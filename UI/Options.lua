@@ -5,6 +5,7 @@ local L = GRB.L
 local function GetOptions()
     local db = GRB.db.profile
     local invite = db.autoInvite
+    local broadcast = db.broadcast
     return {
         type = "group",
         name = L["ADDON_NAME"],
@@ -144,7 +145,63 @@ local function GetOptions()
                     },
                 },
             },
-            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),
+            broadcast = {
+                type = "group",
+                name = L["Interval broadcasting"],
+                order = 3,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["A timer marks channel messages as ready; send them with a keybind or click (Blizzard requires one)."],
+                    },
+                    active = {
+                        type = "toggle",
+                        name = L["Enable interval broadcasting"],
+                        order = 1,
+                        width = "full",
+                        get = function() return GRB.Broadcast:IsActive() end,
+                        set = function(_, value) GRB.Broadcast:SetActive(value) end,
+                    },
+                    keybind = {
+                        type = "description",
+                        order = 2,
+                        name = L["Keybind: Esc > Key Bindings > AddOns > Guild Recruitment Buddy. You can also use /grb send."],
+                    },
+                    sound = {
+                        type = "toggle",
+                        name = L["Play a sound when a broadcast is ready"],
+                        order = 3,
+                        width = "full",
+                        get = function() return broadcast.sound end,
+                        set = function(_, value) broadcast.sound = value end,
+                    },
+                    pauseInInstance = {
+                        type = "toggle",
+                        name = L["Pause in instances, raids and battlegrounds"],
+                        order = 4,
+                        width = "full",
+                        get = function() return broadcast.pauseInInstance end,
+                        set = function(_, value) broadcast.pauseInInstance = value end,
+                    },
+                    pauseInCombat = {
+                        type = "toggle",
+                        name = L["Pause in combat"],
+                        order = 5,
+                        width = "full",
+                        get = function() return broadcast.pauseInCombat end,
+                        set = function(_, value) broadcast.pauseInCombat = value end,
+                    },
+                    pauseWhenAfk = {
+                        type = "toggle",
+                        name = L["Pause while AFK"],
+                        order = 6,
+                        width = "full",
+                        get = function() return broadcast.pauseWhenAfk end,
+                        set = function(_, value) broadcast.pauseWhenAfk = value end,
+                    },
+                },
+            },            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),
         },
     }
 end

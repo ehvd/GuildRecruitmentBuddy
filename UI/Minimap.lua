@@ -17,6 +17,12 @@ local function ShowMenu()
             keepShownOnClick = true,
             func = function() GRB:SetInviteEnabled(not GRB:IsInviteEnabled()) end,
         },
+        {
+            text = L["Interval broadcasting"],
+            checked = function() return GRB.Broadcast:IsActive() end,
+            keepShownOnClick = true,
+            func = function() GRB.Broadcast:SetActive(not GRB.Broadcast:IsActive()) end,
+        },
         { text = L["Settings"], notCheckable = true, func = function() GRB:OpenConfig() end },
     }
     EasyMenu(menu, menuFrame, "cursor", 0, 0, "MENU")

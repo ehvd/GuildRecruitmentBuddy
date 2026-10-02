@@ -13,6 +13,12 @@ Messages are truncated at 255 characters.
 **Design:** a timer may only mark a broadcast as *ready* (button highlight / sound); the user
 presses a keybind or button to actually send it. Never send channel messages from timers/events.
 
+Implementation notes:
+
+- The broadcast is sent with a direct `SendChatMessage` call inside the key binding / button handler. It must not go through ChatThrottleLib, which would defer the call to a later frame and lose the hardware event.
+- Channel messages are addressed by channel index. The addon stores the channel's base name (`Trade` for `Trade - Stormwind City`) and looks the index up with `GetChannelName` at send time, so it survives zone changes and relogs.
+- Pausing: instances (`IsInInstance`), combat and AFK stop new broadcasts from being marked ready.
+
 Source: <https://warcraft.wiki.gg/wiki/API_SendChatMessage>
 
 ## 2. `/who` needs a hardware event and is throttled
