@@ -37,6 +37,14 @@ local defaults = {
             maxLevel = 60,
             zone = "",
         },
+        optOut = {
+            enabled = true,         -- reply such as "not interested" marks a contacted player do-not-contact
+            notify = true,          -- print a chat notice when that happens
+            -- comma separated; a single word only counts at the start of a short reply
+            phrases = "no, no thanks, no thx, not interested, stop, stop spamming, stop whispering, stop messaging, " ..
+                "leave me alone, dont whisper me, dont message me, remove me, unsubscribe",
+            exceptions = "no problem, no worries",   -- replies starting with these are never an opt-out
+        },
         broadcast = {
             active = false,         -- master switch, off by default (/grb broadcast on|off)
             sound = true,           -- sound when a broadcast becomes ready

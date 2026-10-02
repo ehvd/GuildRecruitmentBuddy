@@ -19,6 +19,7 @@ Modules\Contacts.lua
 Modules\Whisper.lua
 Modules\AutoInvite.lua
 Modules\Scanner.lua
+Modules\OptOut.lua
 Modules\Broadcast.lua
 
 UI\InviteFrame.lua
