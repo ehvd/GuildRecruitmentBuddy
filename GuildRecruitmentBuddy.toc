@@ -11,6 +11,10 @@
 embeds.xml
 
 Locales\enUS.lua
+Locales\frFR.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\itIT.lua
 
 Core.lua
 

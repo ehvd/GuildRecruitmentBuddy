@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- Translations: French, German, Spanish (also used by Latin American clients) and Italian, following the language of the game client. The phrase lists for opt-out and lead detection and the default recruitment template come with each language (new profiles; existing profiles keep their current lists), and the opt-out / lead phrase lists keep the English phrases too.
+- `make locales` checks the translations (missing entries, broken `%s` / `{placeholders}`) and runs in CI; `make install LOCALE=deDE` shows the addon in another language on any client.
+
 ## [0.5.0] - 2026-10-02
 
 ### Added

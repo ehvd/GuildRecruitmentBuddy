@@ -21,9 +21,7 @@ local OLD_DEFAULT_TEXT = "Hi {name}! {guild} is looking for more {class}s. Want 
 
 function Messages:OnInitialize()
     local profile = GRB.db.profile
-    local defaultText = L["Hi {name}! Looking for a guild? {guild} is a friendly community looking for more members. "
-        .. "Whisper \"ginv\" for an invite or ask me anything! "
-        .. "Sorry for the cold whisper; reply \"stop\" and I won't message you again."]
+    local defaultText = L["DEFAULT_RECRUITMENT_TEMPLATE"]
 
     if not profile.messagesSeeded then
         profile.messagesSeeded = true

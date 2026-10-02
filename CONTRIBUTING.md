@@ -51,3 +51,11 @@ optional scope, e.g. `feat(scanner): slice queries by level`.
 3. The Release workflow uploads the file to CurseForge and GitHub and, for full releases, attaches the description as `curseforge-description.md` to the GitHub release and prints it in the job summary.
 4. If `docs/curseforge.md` changed since the previous release, the workflow opens an issue assigned to the repository owner (so GitHub notifies them); nothing is opened when the text is unchanged, and older open reminder issues are closed as superseded.
 5. Paste it into the [project description editor on CurseForge](https://authors.curseforge.com/#/projects/1722191/description): run `make description` (clipboard) or copy it from the job summary, then close the issue.
+
+## Translations
+
+Every user-visible string goes through `L["English text"]` (AceLocale); `Locales/enUS.lua` lists them all and the other languages (`frFR`, `deDE`, `esES`, `itIT`) are one file each with `L["English text"] = "translation"`, one entry per line. Keep `%s` / `%d` in the same order (or use `%1$s`) and keep the `{name}` style placeholders unchanged. Strings left out fall back to English.
+
+- `make locales` lists missing entries and fails on broken `%s` / `{placeholders}`, entries that are not in `enUS.lua` and duplicates (CI runs it; add `STRICT=1` to fail on missing entries too)
+- `make install LOCALE=deDE` installs with a language override so a translation can be checked on any client
+- Defaults that depend on the language (the opt-out and lead phrase lists and the default recruitment template) are the `DEFAULT_*` keys; a translation keeps the English phrases in the lists because players often answer in English, and the template must stay under 255 bytes when a 12-letter name and a 24-letter guild name are filled in

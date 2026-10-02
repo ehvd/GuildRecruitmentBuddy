@@ -27,6 +27,8 @@ a memory of who was already contacted, "ginv" auto-invite and a guildless-player
 
 `/guildrecruitmentbuddy` is an alias for `/grb`.
 
+Available in English, French, German, Spanish and Italian (the language follows the game client).
+
 ## Local development
 
 Needs GNU make and a POSIX `sh` with `git`, `cp`, `sed` and `awk` (Git for Windows provides them), plus
@@ -40,11 +42,14 @@ Needs GNU make and a POSIX `sh` with `git`, `cp`, `sed` and `awk` (Git for Windo
 | `make libs` | Fetch the embedded libraries into `Libs/` (gitignored) |
 | `make lint` | Run `luacheck` |
 | `make description` | Copy the CurseForge description (`docs/curseforge.md`) to the clipboard |
+| `make locales` | Check the translations in `Locales/` against `enUS.lua` (missing keys, broken `%s` / `{placeholders}`) |
 | `make clean` | Remove the fetched libraries |
 
 `install` and `link` exclude each other: run `make uninstall` to switch.
 
 The default AddOns folder is `C:/Program Files (x86)/Blizzard/World of Warcraft/_classic_era_/Interface/AddOns`.
+To try a language on any client, install with `make install LOCALE=deDE` (also `frFR`, `esES`, `itIT`); a plain `make install` switches back.
+
 Put personal settings in an untracked `local.mk`, or pass them on the command line:
 
 ```make
