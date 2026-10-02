@@ -5,7 +5,7 @@ manual-changelog:
   markup-type: markdown
 
 externals:
-  Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
+  Libs/LibStub: https://repos.wowace.com/wow/libstub/tags/1.0
   Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
   Libs/AceAddon-3.0: https://repos.wowace.com/wow/ace3/trunk/AceAddon-3.0
   Libs/AceDB-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDB-3.0
@@ -16,7 +16,7 @@ externals:
   Libs/AceGUI-3.0: https://repos.wowace.com/wow/ace3/trunk/AceGUI-3.0
   Libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
   Libs/AceDBOptions-3.0: https://repos.wowace.com/wow/ace3/trunk/AceDBOptions-3.0
-  Libs/ChatThrottleLib: https://repos.wowace.com/wow/chatthrottlelib/trunk
+  Libs/AceComm-3.0: https://repos.wowace.com/wow/ace3/trunk/AceComm-3.0
   Libs/LibDataBroker-1.1: https://github.com/tekkub/libdatabroker-1-1
   Libs/LibDBIcon-1.0: https://repos.wowace.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
 
@@ -29,4 +29,5 @@ ignore:
   - .gitattributes
   - CONTRIBUTING.md
   - README.md
+  - icon.png
   - tests

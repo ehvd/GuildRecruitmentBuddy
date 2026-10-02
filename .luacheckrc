@@ -1,6 +1,7 @@
 std = "lua51"
 max_line_length = 140
 codes = true
+self = false
 
 exclude_files = {
     "**/Libs/**",

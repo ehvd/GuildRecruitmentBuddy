@@ -1,3 +1,5 @@
+<p align="center"><img src="icon.png" alt="GuildRecruitmentBuddy" width="160"></p>
+
 # GuildRecruitmentBuddy
 
 A World of Warcraft **Classic Era** addon that helps guild officers recruit: message templates,
