@@ -11,6 +11,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 - Welcome flow: when someone joins the guild (detected from the client's own join message, so it works in every language) their contact is marked as joined and, if enabled, they get a welcome whisper (default: "Welcome to {guild}, {name}! Our Discord: {discord}") a few seconds later. Off by default; optionally only for players you contacted or invited; do-not-contact players are never welcomed or re-labelled.
 
 ### Changed
+- The CurseForge description now lives in `docs/curseforge.md`; releases attach it to the GitHub release and `make description` copies it to the clipboard (CurseForge has no API to update it). When it changed since the previous release, the release workflow opens an issue assigned to the repository owner as the reminder to paste it.
 - The project icon is now used for the minimap button and in the addon list (a round 128x128 texture in `Media/`).
 
 ## [0.2.0] - 2026-10-02

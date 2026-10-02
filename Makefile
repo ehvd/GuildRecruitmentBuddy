@@ -22,10 +22,10 @@ PS_MAKE_LINK     = New-Item -ItemType Junction -Path $$env:T -Target (Resolve-Pa
 PS_REMOVE        = if (Test-Path -LiteralPath $$env:T) { $$i = Get-Item -LiteralPath $$env:T -Force; if ($$i.Attributes -band [IO.FileAttributes]::ReparsePoint) { [IO.Directory]::Delete($$i.FullName) } else { Remove-Item -LiteralPath $$i.FullName -Recurse -Force } }
 
 .DEFAULT_GOAL := help
-.PHONY: help libs lint install link uninstall clean check-addon-dir
+.PHONY: help libs lint install link uninstall description clean check-addon-dir
 
 help: ## Show this help
-	@grep -hE '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-10s %s\n", $$1, $$2}'
+	@grep -hE '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
 	@echo ""
 	@echo "AddOns folder: $(ADDON_DIR)"
 
@@ -77,6 +77,10 @@ link: libs check-addon-dir ## Junction the repo into AddOns for live development
 uninstall: check-addon-dir ## Remove the installed addon or the link (never touches the repo)
 	@T="$(DEST)" powershell -NoProfile -Command '$(PS_REMOVE)'
 	@echo "Removed $(DEST)"
+
+description: ## Copy the CurseForge description (docs/curseforge.md) to the clipboard
+	@powershell -NoProfile -Command 'Get-Content -Raw -Encoding UTF8 docs/curseforge.md | Set-Clipboard'
+	@echo "Copied docs/curseforge.md to the clipboard. Paste it into the project description: https://authors.curseforge.com/#/projects/1722191/description"
 
 clean: ## Remove the fetched libraries
 	rm -rf Libs .libs-tmp

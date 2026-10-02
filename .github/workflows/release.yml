@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   package:
@@ -23,3 +24,43 @@ jobs:
           fetch-depth: 0
       - name: Package and upload
         uses: BigWigsMods/packager@v2
+
+      # CurseForge has no API to edit a project's description. For full releases (not alpha/beta) the repo's
+      # description is attached to the GitHub release and shown in the job summary, ready to paste (make description).
+      - name: Attach the CurseForge description
+        if: ${{ !contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp docs/curseforge.md curseforge-description.md
+          gh release upload "$GITHUB_REF_NAME" curseforge-description.md --clobber
+          {
+            echo "## CurseForge description for $GITHUB_REF_NAME"
+            echo "Paste this into the project description (https://authors.curseforge.com/#/projects/1722191/description). It is also attached to the release as curseforge-description.md."
+            echo
+            cat docs/curseforge.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Nothing to do when the description is unchanged since the previous full release. Otherwise an issue
+      # assigned to the repository owner is the notification that the CurseForge description needs pasting.
+      - name: Open an issue when the CurseForge description changed
+        if: ${{ !contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+        run: |
+          previous=$(git describe --tags --abbrev=0 --exclude='*-*' "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          if [ -n "$previous" ] && git diff --quiet "$previous" "$GITHUB_REF_NAME" -- docs/curseforge.md; then
+            echo "The CurseForge description is unchanged since $previous."
+            exit 0
+          fi
+          gh issue create \
+            --title "Update the CurseForge description for $GITHUB_REF_NAME" \
+            --assignee "$OWNER" \
+            --label "type: docs" \
+            --body "docs/curseforge.md changed since ${previous:-the first release}. CurseForge cannot be updated by CI, so please paste it:
+
+          1. Run \`make description\` (clipboard) or download \`curseforge-description.md\` from $RELEASE_URL
+          2. Open the project description editor on CurseForge (https://authors.curseforge.com/#/projects/1722191/description), paste it and save
+          3. Close this issue"
