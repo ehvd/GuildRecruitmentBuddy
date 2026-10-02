@@ -7,3 +7,7 @@ Libs/
 Thumbs.db
 .DS_Store
 .env
+
+# Local tooling
+.libs-tmp/
+local.mk
