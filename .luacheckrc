@@ -16,6 +16,7 @@ globals = {
     "SLASH_GRB2",
     "SlashCmdList",
     "StaticPopupDialogs",
+    "GuildRecruitmentBuddyMainFrame",
     "UISpecialFrames",
 }
 
@@ -48,6 +49,6 @@ read_globals = {
     "GetChannelList", "GetChannelName", "Ambiguate", "FlashClientIcon", "RAID_CLASS_COLORS",
     "LOCALIZED_CLASS_NAMES_MALE", "LOCALIZED_CLASS_NAMES_FEMALE", "CLASS_SORT_ORDER",
     "GetNumClasses", "GetClassInfo", "GetAddOnMetadata", "C_AddOns",
-    "GetCursorPosition", "Minimap", "MinimapCluster",
+    "ACCEPT", "CANCEL", "GetCursorPosition", "Minimap", "MinimapCluster",
     "CHAT_MSG_WHISPER", "WHO_LIST_UPDATE",
 }

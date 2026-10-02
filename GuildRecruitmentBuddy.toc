@@ -14,5 +14,9 @@ Locales\enUS.lua
 
 Core.lua
 
+Modules\Messages.lua
+
+UI\MainFrame.lua
+UI\MessagesTab.lua
 UI\Options.lua
 UI\Minimap.lua
