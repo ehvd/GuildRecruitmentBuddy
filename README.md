@@ -36,6 +36,7 @@ Needs GNU make and a POSIX `sh` with `git`, `cp`, `sed` and `awk` (Git for Windo
 | `make uninstall` | Remove the installed copy or the link (never touches the repo) |
 | `make libs` | Fetch the embedded libraries into `Libs/` (gitignored) |
 | `make lint` | Run `luacheck` |
+| `make description` | Copy the CurseForge description (`docs/curseforge.md`) to the clipboard |
 | `make clean` | Remove the fetched libraries |
 
 `install` and `link` exclude each other: run `make uninstall` to switch.

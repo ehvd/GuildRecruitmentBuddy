@@ -23,3 +23,19 @@ jobs:
           fetch-depth: 0
       - name: Package and upload
         uses: BigWigsMods/packager@v2
+
+      # CurseForge has no API to edit a project's description. For full releases (not alpha/beta) the repo's
+      # description is attached to the GitHub release and shown in the job summary, ready to paste (make description).
+      - name: Attach the CurseForge description
+        if: ${{ !contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp docs/curseforge.md curseforge-description.md
+          gh release upload "$GITHUB_REF_NAME" curseforge-description.md --clobber
+          {
+            echo "## CurseForge description for $GITHUB_REF_NAME"
+            echo "Paste this into the project description (also attached to the release as curseforge-description.md)."
+            echo
+            cat docs/curseforge.md
+          } >> "$GITHUB_STEP_SUMMARY"
