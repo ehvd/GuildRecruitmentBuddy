@@ -5,18 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-02
+
+First release (MVP) for WoW Classic Era.
+
 ### Added
-- Project setup: repository, git flow, templates.
-- Documentation of Blizzard platform constraints (docs/CONSTRAINTS.md).
-- Lint workflow (luacheck) and `.luacheckrc`.
-- Release workflow (BigWigs packager -> CurseForge/GitHub) and `.pkgmeta`.
-- Addon skeleton: `.toc` (Interface 11509), embeds, AceAddon core, AceDB, `/grb` + `/guildrecruitmentbuddy` slash commands, minimap button, options panel and `scripts/fetch-libs.ps1`.
-- Project icon (`icon.png`).
-- CurseForge project ID in the `.toc`.
 - Message templates: create, edit, delete and reorder named whisper/channel messages with `{name}` `{class}` `{level}` `{guild}` `{discord}` placeholders, 255-character validation and live preview.
-- Tabbed main window (`/grb`) with the Messages tab; settings for the Discord link and guild name override.
-- Contacted-player database (shared across characters, keyed `Name-Realm`) with statuses, configurable whisper cooldown, guild-member skipping and automatic `replied` status.
-- Throttled whisper sending (ChatThrottleLib) with a per-session rate limit; Contacts tab with sortable/filterable list, status changes, delete, purge and a manual whisper box that shows why sending is disabled.
-- Auto guild invite: whispers containing a keyword (default `ginv`) queue an invite request shown in a click-to-invite popup (Blizzard requires a click for guild invites), with minimum level, allowed classes, do-not-contact and per-player cooldown rules and an optional auto-reply whisper. Off by default; toggle with `/grb invite on|off`, the minimap menu or settings.
-- Guildless player scanner: `/who` queries sliced by class and level (adaptively split when a query returns a full page), one query per click with throttle countdown, guildless results with contact/cooldown status, per-row Whisper / Invite / Block, a throttled batch "Whisper all eligible", and temporary suppression of the default Who UI.
-- Main window finished: tabs Messages | Scanner | Contacts | Settings, remembered position and size, settings embedded in the window (`/grb config`) and in Blizzard Interface Options (`/grb options`).
+- Contacted-player database shared across characters (keyed `Name-Realm`) with statuses (contacted, replied, invited, joined, declined, do-not-contact), configurable whisper cooldown (default 14 days), automatic skipping of guild members and an automatic `replied` status.
+- Throttled whisper sending (ChatThrottleLib) with a per-session rate limit; the Contacts tab has a sortable, filterable list, status changes, delete, purge and a manual whisper box that shows why sending is disabled.
+- Auto guild invite: whispers containing a keyword (default `ginv`) queue an invite request shown in a click-to-invite popup (Blizzard requires a click for guild invites). Rules for minimum level, allowed classes, do-not-contact and a per-player cooldown, plus an optional auto-reply whisper. Off by default; toggle with `/grb invite on|off`, the minimap menu or settings.
+- Guildless player scanner: `/who` queries sliced by class and level (split further when a query returns a full page), one query per click with a throttle countdown, results with contact/cooldown status, per-row Whisper / Invite / Block and a throttled "Whisper all eligible". The default Who window is suppressed while a query runs.
+- Tabbed main window (Messages | Scanner | Contacts | Settings) with remembered position and size, minimap button, and settings in the window (`/grb config`) and in Blizzard Interface Options (`/grb options`).
+- Slash commands `/grb` and `/guildrecruitmentbuddy`.
+
+### Development
+- Git flow repository, luacheck CI and tag-triggered CurseForge/GitHub releases (BigWigs packager).
+- Documentation of Blizzard platform constraints (`docs/CONSTRAINTS.md`).
+
+[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.1.0...develop
+[0.1.0]: https://github.com/ehvd/GuildRecruitmentBuddy/releases/tag/v0.1.0
