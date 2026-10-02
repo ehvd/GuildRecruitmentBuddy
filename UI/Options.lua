@@ -307,6 +307,59 @@ local function GetOptions()
                         get = function() return welcome.text end,
                         set = function(_, value) welcome.text = value or "" end,
                     },
+                    placeholders = {
+                        type = "description",
+                        order = 3.1,
+                        fontSize = "medium",
+                        name = L["Placeholders: {name} {class} {level} {guild} {discord}"] .. "\n" ..
+                            L["{class} and {level} are only known for players in your contact database. "
+                                .. "An unknown {class} becomes \"adventurer\", and the welcome is skipped "
+                                .. "when it uses {level} and the level is unknown."],
+                    },
+                    previewHeader = {
+                        type = "header",
+                        order = 4,
+                        name = L["Preview"],
+                    },
+                    previewCounter = {
+                        type = "description",
+                        order = 4.1,
+                        name = function()
+                            local result = GRB.Messages:Validate(welcome.text, GRB.Messages:GetSampleContext())
+                            local color = result.ok and "|cff40ff40" or "|cffff4040"
+                            return format("%s%d / %d|r", color, result.length, GRB.Messages.MAX_LENGTH)
+                        end,
+                    },
+                    previewWarning = {
+                        type = "description",
+                        order = 4.2,
+                        hidden = function()
+                            local result = GRB.Messages:Validate(welcome.text, GRB.Messages:GetSampleContext())
+                            return result.length <= GRB.Messages.MAX_LENGTH and #result.unknown == 0 and #result.unresolved == 0
+                        end,
+                        name = function()
+                            local result = GRB.Messages:Validate(welcome.text, GRB.Messages:GetSampleContext())
+                            local notes = {}
+                            if result.length > GRB.Messages.MAX_LENGTH then
+                                tinsert(notes, format(L["Too long by %d characters."], result.length - GRB.Messages.MAX_LENGTH))
+                            end
+                            if #result.unknown > 0 then
+                                tinsert(notes, format(L["Unknown placeholders: %s"], table.concat(result.unknown, " ")))
+                            end
+                            if #result.unresolved > 0 then
+                                tinsert(notes, format(L["Not set (see Settings): %s"], table.concat(result.unresolved, " ")))
+                            end
+                            return "|cffffd100" .. table.concat(notes, "  ") .. "|r"
+                        end,
+                    },
+                    previewText = {
+                        type = "description",
+                        order = 4.3,
+                        fontSize = "medium",
+                        name = function()
+                            return (GRB.Messages:Validate(welcome.text, GRB.Messages:GetSampleContext()).rendered)
+                        end,
+                    },
                 },
             },            quiet = {
                 type = "group",
