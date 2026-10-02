@@ -275,5 +275,5 @@ L["Ask before adding a player to the do-not-contact list"] = true
 L["A popup shows the message that triggered the request, with buttons to add the player or skip."] = true
 L["Opt-out request"] = true
 L["%s replied:"] = true
-L["Add to do-not-contact list"] = true
+L["Opt out"] = true
 L["%s asked to stop; decide on the opt-out request first."] = true

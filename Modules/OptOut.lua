@@ -121,7 +121,7 @@ function OptOut:Apply(entry)
     end
 end
 
--- The popup's "Add to do-not-contact list" button
+-- The popup's "Opt out" button
 function OptOut:ConfirmNext()
     local entry = tremove(queue, 1)
     if entry then

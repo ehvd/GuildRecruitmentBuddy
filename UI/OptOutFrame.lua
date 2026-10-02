@@ -3,16 +3,19 @@ local L = GRB.L
 
 -- Small movable popup that asks what to do with a player who seems to have opted out of recruitment whispers:
 -- it shows the message that triggered the request, with buttons to put the player on the do-not-contact list
--- or to skip the request (the player then stays a normal contact).
+-- ("Opt out") or to skip the request (the player then stays a normal contact).
 local OptOutFrame = {}
 GRB.OptOutFrame = OptOutFrame
 
 local frame
 
-local BUTTON_WIDTH = 150
+local WIDTH = 330
+local TEXT_WIDTH = 290
+local BUTTON_WIDTH = 140
 local BUTTON_HEIGHT = 24
 local GAP = 10
-local BOTTOM_PADDING = 28
+local TOP_PADDING = 24
+local BOTTOM_PADDING = 22
 
 local function CreateButton(text, onClick)
     local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
@@ -24,7 +27,7 @@ end
 
 local function Create()
     frame = CreateFrame("Frame", "GuildRecruitmentBuddyOptOutFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(360, 210)
+    frame:SetSize(WIDTH, 120)
     frame:SetPoint("TOP", UIParent, "TOP", 0, -480)
     frame:SetFrameStrata("DIALOG")
     frame:SetBackdrop({
@@ -41,38 +44,46 @@ local function Create()
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    frame.title:SetPoint("TOP", frame, "TOP", 0, -26)
+    frame.title:SetPoint("TOP", frame, "TOP", 0, -TOP_PADDING)
     frame.title:SetText(L["Opt-out request"])
 
     frame.who = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    frame.who:SetPoint("TOP", frame.title, "BOTTOM", 0, -12)
-    frame.who:SetWidth(310)
+    frame.who:SetPoint("TOP", frame.title, "BOTTOM", 0, -10)
+    frame.who:SetWidth(TEXT_WIDTH)
 
     -- The message that triggered the request
     frame.message = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    frame.message:SetPoint("TOP", frame.who, "BOTTOM", 0, -8)
-    frame.message:SetWidth(310)
+    frame.message:SetPoint("TOP", frame.who, "BOTTOM", 0, -6)
+    frame.message:SetWidth(TEXT_WIDTH)
     frame.message:SetJustifyH("CENTER")
     frame.message:SetWordWrap(true)
     frame.message:SetTextColor(1, 1, 1)
 
     frame.more = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    frame.more:SetPoint("BOTTOM", frame, "BOTTOM", 0, BOTTOM_PADDING + BUTTON_HEIGHT + 8)
-    frame.more:SetWidth(310)
+    frame.more:SetPoint("TOP", frame.message, "BOTTOM", 0, -6)
+    frame.more:SetWidth(TEXT_WIDTH)
 
-    frame.confirm = CreateButton(L["Add to do-not-contact list"], function()
+    frame.confirm = CreateButton(L["Opt out"], function()
         GRB.OptOut:ConfirmNext()
     end)
-    frame.confirm:SetSize(BUTTON_WIDTH + 30, BUTTON_HEIGHT)
     frame.confirm:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -GAP / 2, BOTTOM_PADDING)
 
     frame.skip = CreateButton(L["Skip"], function()
         GRB.OptOut:SkipNext()
     end)
-    frame.skip:SetSize(BUTTON_WIDTH - 30, BUTTON_HEIGHT)
     frame.skip:SetPoint("BOTTOMLEFT", frame, "BOTTOM", GAP / 2, BOTTOM_PADDING)
 
     frame:Hide()
+end
+
+-- The frame is exactly as tall as its content, so there is no empty space whatever the message length
+local function Resize()
+    local height = TOP_PADDING + frame.title:GetStringHeight() + 10 + frame.who:GetStringHeight()
+        + 6 + frame.message:GetStringHeight()
+    if frame.more:GetText() ~= "" then
+        height = height + 6 + frame.more:GetStringHeight()
+    end
+    frame:SetHeight(height + 14 + BUTTON_HEIGHT + BOTTOM_PADDING)
 end
 
 -- Shows the first pending request, or hides the popup when there is none or quiet mode is active.
@@ -89,5 +100,10 @@ function OptOutFrame:Update()
     -- "|" starts escape sequences in chat text, so a player's message must not be able to inject any
     frame.message:SetText("\"" .. gsub(entry.text, "|", "||") .. "\"")
     frame.more:SetText(#queue > 1 and format(L["%d more waiting"], #queue - 1) or "")
+    Resize()
     frame:Show()
+    -- Text heights are only exact once the frame has been laid out, so measure again on the next frame
+    C_Timer.After(0, function()
+        if frame:IsShown() then Resize() end
+    end)
 end
