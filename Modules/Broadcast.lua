@@ -109,10 +109,15 @@ function Broadcast:Notify()
 end
 
 -- Called when a message is edited or deleted. Enabling, retargeting or changing the channel restarts its timer;
--- a new interval only applies from the next send.
+-- a shorter interval applies immediately, a longer one from the next send.
 function Broadcast:OnMessageChanged(id, fields)
     if not fields or fields.broadcast ~= nil or fields.target ~= nil or fields.channel ~= nil then
         nextDue[id] = nil
+    elseif fields.interval ~= nil and nextDue[id] then
+        local msg = GRB.Messages:Get(id)
+        if msg then
+            nextDue[id] = min(nextDue[id], GetTime() + msg.interval * 60)
+        end
     end
     local msg = GRB.Messages:Get(id)
     if not msg or msg.target ~= "channel" or not msg.broadcast then
