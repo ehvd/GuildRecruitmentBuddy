@@ -37,6 +37,28 @@ local function StatusLine(entry)
     return color .. text .. "|r"
 end
 
+-- The text of the entry's message as it is sent to the channel, with a note for placeholders that stay unfilled
+local function PreviewText(entry)
+    local msg = Broadcast:GetMessage(entry)
+    if not msg then return "" end
+    local result = Messages:Validate(msg.text, Messages:GetBaseContext())
+    local text = result.rendered
+    local notes = {}
+    if result.length > Messages.MAX_LENGTH then
+        tinsert(notes, format(L["Too long by %d characters."], result.length - Messages.MAX_LENGTH))
+    end
+    if #result.unknown > 0 then
+        tinsert(notes, format(L["Unknown placeholders: %s"], table.concat(result.unknown, " ")))
+    end
+    if #result.unresolved > 0 then
+        tinsert(notes, format(L["Not set (see Settings): %s"], table.concat(result.unresolved, " ")))
+    end
+    if #notes > 0 then
+        text = text .. "\n|cffffd100" .. table.concat(notes, "  ") .. "|r"
+    end
+    return text
+end
+
 local function ChannelMessages()
     local list = {}
     for _, msg in ipairs(Messages:GetAll()) do
@@ -159,6 +181,13 @@ local function Build(container)
         interval:SetValue(entry.interval)
         interval:SetRelativeWidth(0.3)
         group:AddChild(interval)
+
+        -- Preview of the message that is sent
+        local preview = AceGUI:Create("Label")
+        preview:SetFontObject(GameFontHighlight)
+        preview:SetText(PreviewText(entry))
+        preview:SetFullWidth(true)
+        group:AddChild(preview)
 
         -- Row 2: state and actions
         local active = AceGUI:Create("CheckBox")

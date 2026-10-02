@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- Broadcast tab: every broadcast shows a preview of its message as it will be sent (`{guild}` and `{discord}` filled in), with warnings for unknown or unset placeholders and texts that are too long.
+
 ### Fixed
 - Opening Settings raised an AceLocale "Missing entry for 'In combat'" error (the Quiet mode toggle had no translation entry). `make locales` and CI now also fail when the code uses a text that `enUS.lua` does not define.
 
