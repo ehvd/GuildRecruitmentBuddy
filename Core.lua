@@ -21,6 +21,8 @@ local defaults = {
         messages = {},    -- { id, name, target = "whisper"|"channel", text }
         nextMessageId = 1,
         messagesSeeded = false,
+        cooldownDays = 14,          -- days before the same player may be whispered again (0 = off)
+        maxWhispersPerMinute = 8,   -- session rate limit for whispers sent through the addon
     },
     global = {
         contacts = {},
