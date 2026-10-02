@@ -151,7 +151,6 @@ L["Broadcasting is off (/grb broadcast on)."] = true
 L["/grb broadcast on|off - toggle interval broadcasting"] = true
 L["/grb send - send the ready channel broadcast"] = true
 L["Send the ready channel broadcast"] = true
-L["in an instance"] = true
 L["in combat"] = true
 L["AFK"] = true
 L["Paused: %s."] = true
@@ -169,8 +168,6 @@ L["%s (not joined)"] = true
 L["A timer marks channel messages as ready; send them with a keybind or click (Blizzard requires one)."] = true
 L["Keybind: Esc > Key Bindings > AddOns > Guild Recruitment Buddy. You can also use /grb send."] = true
 L["Play a sound when a broadcast is ready"] = true
-L["Pause in instances, raids and battlegrounds"] = true
-L["Pause in combat"] = true
 L["Pause while AFK"] = true
 
 -- Opt-out detection
@@ -219,3 +216,21 @@ L["Welcome message"] = true
 L["Welcomed %s."] = true
 L["Welcome message to %s skipped: %s"] = true
 L["The text is empty, too long or has unset placeholders."] = true
+
+-- Quiet mode
+L["Quiet mode"] = true
+L["Quiet mode (manual)"] = true
+L["Quiet mode: %s"] = true
+L["Manual quiet mode is now %s."] = true
+L["/grb quiet on|off - switch quiet mode on or off by hand"] = true
+L["switched on manually"] = true
+L["in a dungeon"] = true
+L["in a raid"] = true
+L["in a battleground"] = true
+L["Keeps recruiting out of the way: no broadcast popups, silent invite requests, held-back welcomes."] = true
+L["Enable automatic quiet mode"] = true
+L["In combat"] = true
+L["In dungeons"] = true
+L["In raids"] = true
+L["In battlegrounds and arenas"] = true
+L["Switch quiet mode on by hand with /grb quiet on and off with /grb quiet off."] = true

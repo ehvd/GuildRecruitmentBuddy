@@ -23,6 +23,12 @@ local function ShowMenu()
             keepShownOnClick = true,
             func = function() GRB.Broadcast:SetActive(not GRB.Broadcast:IsActive()) end,
         },
+        {
+            text = L["Quiet mode (manual)"],
+            checked = function() return GRB.Quiet:IsManual() end,
+            keepShownOnClick = true,
+            func = function() GRB.Quiet:SetManual(not GRB.Quiet:IsManual()) end,
+        },
         { text = L["Settings"], notCheckable = true, func = function() GRB:OpenConfig() end },
     }
     -- EasyMenu was removed from the client; it only wrapped these UIDropDownMenu calls
@@ -53,6 +59,10 @@ local launcher = LDB:NewDataObject(ADDON_NAME, {
         tooltip:AddLine(L["ADDON_NAME"] .. " " .. GRB.version)
         tooltip:AddLine(L["Left-click: open window"], 1, 1, 1)
         tooltip:AddLine(L["Right-click: menu"], 1, 1, 1)
+        local quiet = GRB.Quiet:GetReason()
+        if quiet then
+            tooltip:AddLine(format(L["Quiet mode: %s"], quiet), 1, 0.82, 0)
+        end
     end,
 })
 
@@ -66,4 +76,14 @@ end
 
 function GRB:SetupMinimapButton()
     DBIcon:Register(ADDON_NAME, launcher, self.db.profile.minimap)
+    self:UpdateMinimapQuiet()
+    GRB.Quiet:OnChange(function() GRB:UpdateMinimapQuiet() end)
+end
+
+-- The icon is greyed out while quiet mode is active
+function GRB:UpdateMinimapQuiet()
+    local button = DBIcon:GetMinimapButton(ADDON_NAME)
+    if button and button.icon then
+        button.icon:SetDesaturated(GRB.Quiet:IsQuiet())
+    end
 end

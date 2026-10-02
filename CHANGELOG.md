@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ## [Unreleased]
 
 ### Added
+- Quiet mode: recruiting stays out of the way in combat, dungeons, raids and battlegrounds (each switchable in Settings > Quiet mode) or when switched on by hand with `/grb quiet on|off` or the minimap menu. Broadcasts are not marked ready and their popup is hidden, "ginv" requests are queued silently and the invite popup waits, welcome whispers are held back until it ends. The window status bar and the minimap button (greyed out) show when it is active. The combat/instance pause of broadcasting moved here from the broadcast settings.
 - Welcome flow: when someone joins the guild (detected from the client's own join message, so it works in every language) their contact is marked as joined and, if enabled, they get a welcome whisper (default: "Welcome to {guild}, {name}! Our Discord: {discord}") a few seconds later. Off by default; optionally only for players you contacted or invited; do-not-contact players are never welcomed or re-labelled.
 
 ### Changed

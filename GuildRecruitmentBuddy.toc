@@ -15,6 +15,7 @@ Locales\enUS.lua
 Core.lua
 
 Modules\Messages.lua
+Modules\Quiet.lua
 Modules\Contacts.lua
 Modules\Whisper.lua
 Modules\AutoInvite.lua

@@ -52,7 +52,13 @@ function Welcome:OnJoined(name)
     self:ScheduleTimer("SendWelcome", WELCOME_DELAY, key)
 end
 
+local held = {}   -- players waiting for a welcome until quiet mode ends
+
 function Welcome:SendWelcome(key)
+    if GRB.Quiet:IsQuiet() then
+        held[key] = true
+        return
+    end
     local contact = GRB.Contacts:Get(key)
     local ok, reason = GRB.Whisper:SendFreeText(key, Settings().text, {
         class = contact and contact.class,
@@ -69,4 +75,14 @@ end
 
 function Welcome:OnEnable()
     self:RegisterEvent("CHAT_MSG_SYSTEM", "OnSystemMessage")
+    GRB.Quiet:OnChange(function(reason)
+        if reason then return end
+        -- Quiet mode ended: send the held-back welcomes a couple of seconds apart
+        local delay = WELCOME_DELAY
+        for key in pairs(held) do
+            held[key] = nil
+            self:ScheduleTimer("SendWelcome", delay, key)
+            delay = delay + 2
+        end
+    end)
 end
