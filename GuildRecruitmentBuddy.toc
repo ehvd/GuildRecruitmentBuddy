@@ -26,6 +26,7 @@ UI\InviteFrame.lua
 UI\BroadcastFrame.lua
 UI\MainFrame.lua
 UI\MessagesTab.lua
+UI\BroadcastTab.lua
 UI\ScannerTab.lua
 UI\ContactsTab.lua
 UI\Options.lua

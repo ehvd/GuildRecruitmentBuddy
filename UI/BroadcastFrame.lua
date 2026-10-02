@@ -8,9 +8,22 @@ GRB.BroadcastFrame = BroadcastFrame
 
 local frame
 
+local BUTTON_WIDTH = 150
+local BUTTON_HEIGHT = 24
+local GAP = 10          -- space between buttons and between button rows
+local BOTTOM_PADDING = 28
+
+local function CreateButton(text, onClick)
+    local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+    button:SetText(text)
+    button:SetScript("OnClick", onClick)
+    return button
+end
+
 local function Create()
     frame = CreateFrame("Frame", "GuildRecruitmentBuddyBroadcastFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(300, 120)
+    frame:SetSize(360, 196)
     frame:SetPoint("TOP", UIParent, "TOP", 0, -290)
     frame:SetFrameStrata("DIALOG")
     frame:SetBackdrop({
@@ -27,32 +40,62 @@ local function Create()
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    frame.title:SetPoint("TOP", frame, "TOP", 0, -18)
+    frame.title:SetPoint("TOP", frame, "TOP", 0, -26)
     frame.title:SetText(L["Broadcast ready"])
 
+    -- Cogwheel in the top right corner: opens the Broadcast tab of the main window
+    frame.settings = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.settings:SetSize(24, 24)
+    frame.settings:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -24, -20)
+    local cog = frame.settings:CreateTexture(nil, "OVERLAY")
+    cog:SetTexture("Interface\\Buttons\\UI-OptionsButton")
+    cog:SetSize(16, 16)
+    cog:SetPoint("CENTER")
+    frame.settings:SetScript("OnClick", function()
+        GRB.MainFrame:Open("Broadcast")
+    end)
+    frame.settings:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Broadcast settings"])
+        GameTooltip:Show()
+    end)
+    frame.settings:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
     frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    frame.text:SetPoint("TOP", frame.title, "BOTTOM", 0, -8)
-    frame.text:SetWidth(270)
+    frame.text:SetPoint("TOP", frame.title, "BOTTOM", 0, -16)
+    frame.text:SetWidth(310)
 
     frame.hint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    frame.hint:SetPoint("TOP", frame.text, "BOTTOM", 0, -4)
-    frame.hint:SetWidth(270)
+    frame.hint:SetPoint("TOP", frame.text, "BOTTOM", 0, -8)
+    frame.hint:SetWidth(310)
 
-    frame.send = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    frame.send:SetSize(110, 24)
-    frame.send:SetPoint("BOTTOMLEFT", frame, "BOTTOM", -115, 18)
-    frame.send:SetText(L["Send"])
-    frame.send:SetScript("OnClick", function()
+    -- Row 1: send or skip
+    local rowOne = BOTTOM_PADDING + BUTTON_HEIGHT + GAP
+    frame.send = CreateButton(L["Send"], function()
         GRB.Broadcast:SendNext()
     end)
+    frame.send:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -GAP / 2, rowOne)
 
-    frame.skip = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    frame.skip:SetSize(110, 24)
-    frame.skip:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", 115, 18)
-    frame.skip:SetText(L["Skip"])
-    frame.skip:SetScript("OnClick", function()
+    frame.skip = CreateButton(L["Skip"], function()
         GRB.Broadcast:SkipNext()
     end)
+    frame.skip:SetPoint("BOTTOMLEFT", frame, "BOTTOM", GAP / 2, rowOne)
+
+    -- Row 2: switch off this broadcast, or the whole feature
+    frame.disableEntry = CreateButton(L["Disable this broadcast"], function()
+        if frame.entryId then
+            GRB.Broadcast:UpdateEntry(frame.entryId, { active = false })
+            GRB:Print(L["Broadcast disabled. You can enable it again in the Broadcast tab."])
+        end
+    end)
+    frame.disableEntry:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -GAP / 2, BOTTOM_PADDING)
+
+    frame.disableAll = CreateButton(L["Disable broadcasting"], function()
+        GRB.Broadcast:SetActive(false)
+    end)
+    frame.disableAll:SetPoint("BOTTOMLEFT", frame, "BOTTOM", GAP / 2, BOTTOM_PADDING)
 
     frame:Hide()
 end
@@ -61,14 +104,16 @@ end
 function BroadcastFrame:Update()
     local broadcast = GRB.Broadcast
     local id = broadcast:GetReady()[1]
-    local msg = id and GRB.Messages:Get(id)
+    local entry = id and broadcast:GetEntry(id)
+    local msg = entry and broadcast:GetMessage(entry)
     if not msg or not broadcast:IsActive() or broadcast:GetPauseReason() then
         if frame then frame:Hide() end
         return
     end
     if not frame then Create() end
 
-    local channel = msg.channel ~= "" and msg.channel or "?"
+    frame.entryId = entry.id
+    local channel = entry.channel ~= "" and entry.channel or "?"
     frame.text:SetText(format(L["\"%s\" to %s"], msg.name, channel))
 
     local key = GetBindingKey("GUILDRECRUITMENTBUDDY_SEND")

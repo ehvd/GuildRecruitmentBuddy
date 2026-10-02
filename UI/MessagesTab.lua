@@ -6,9 +6,6 @@ local Messages = GRB.Messages
 
 local DELETE_POPUP = "GUILDRECRUITMENTBUDDY_DELETE_MESSAGE"
 
-local Broadcast = GRB.Broadcast
-
-local ticker      -- repeating timer that keeps the broadcast status line current
 local ui          -- widgets of the currently shown tab, nil when the tab is not shown
 local selectedId  -- id of the message being edited
 
@@ -112,28 +109,7 @@ local function Build(container)
     scroll:AddChild(textBox)
 
     scroll:AddChild(Label(L["Placeholders: {name} {class} {level} {guild} {discord}"]))
-
-    -- Interval broadcasting (channel messages) -------------------------------
-    scroll:AddChild(Heading(L["Interval broadcasting"]))
-
-    local channelDropdown = AceGUI:Create("Dropdown")
-    channelDropdown:SetLabel(L["Channel"])
-    channelDropdown:SetRelativeWidth(0.34)
-    scroll:AddChild(channelDropdown)
-
-    local intervalSlider = AceGUI:Create("Slider")
-    intervalSlider:SetLabel(L["Every (minutes)"])
-    intervalSlider:SetSliderValues(1, Messages.MAX_INTERVAL, 1)
-    intervalSlider:SetRelativeWidth(0.4)
-    scroll:AddChild(intervalSlider)
-
-    local broadcastBox = AceGUI:Create("CheckBox")
-    broadcastBox:SetLabel(L["Broadcast"])
-    broadcastBox:SetRelativeWidth(0.24)
-    scroll:AddChild(broadcastBox)
-
-    local broadcastStatus = Label()
-    scroll:AddChild(broadcastStatus)
+    scroll:AddChild(Label(L["Channel, interval and on/off of channel messages are set in the Broadcast tab."]))
 
     -- Preview --------------------------------------------------------------
     scroll:AddChild(Heading(L["Preview"]))
@@ -178,50 +154,6 @@ local function Build(container)
         scroll:DoLayout()
     end
 
-    local lastStatus
-
-    -- Runs every second (ticker), so only re-layout when the text changed
-    function widgets.RefreshBroadcastStatus()
-        local text = Broadcast:GetStatusText(selectedId)
-        if text ~= lastStatus then
-            lastStatus = text
-            broadcastStatus:SetText(text)
-            scroll:DoLayout()
-        end
-    end
-
-    -- Lists the channels joined right now; a saved channel that is not joined stays selectable.
-    local function RefreshChannelList(msg)
-        local values, order = {}, {}
-        local current = msg and msg.channel or ""
-        local selected
-        for _, name in ipairs(Broadcast:GetJoinedChannels()) do
-            values[name] = name
-            tinsert(order, name)
-            if name:lower() == current:lower() then selected = name end
-        end
-        if current ~= "" and not selected then
-            values[current] = format(L["%s (not joined)"], current)
-            tinsert(order, current)
-            selected = current
-        end
-        channelDropdown:SetList(values, order)
-        channelDropdown:SetValue(selected)
-    end
-
-    function widgets.RefreshBroadcastFields()
-        local msg = Messages:Get(selectedId)
-        local isChannel = msg ~= nil and msg.target == "channel"
-        channelDropdown:SetDisabled(not isChannel)
-        intervalSlider:SetDisabled(not isChannel)
-        broadcastBox:SetDisabled(not isChannel)
-        RefreshChannelList(msg)
-        intervalSlider:SetValue(msg and msg.interval or Messages.DEFAULT_INTERVAL)
-        broadcastBox:SetValue(msg ~= nil and msg.broadcast == true)
-        lastStatus = nil
-        widgets.RefreshBroadcastStatus()
-    end
-
     function widgets.RefreshList()
         local values, order = {}, {}
         for _, msg in ipairs(Messages:GetAll()) do
@@ -248,7 +180,6 @@ local function Build(container)
         nameBox:SetText(msg and msg.name or "")
         targetDropdown:SetValue(msg and msg.target or nil)
         textBox:SetText(msg and msg.text or "")
-        widgets.RefreshBroadcastFields()
         UpdatePreview()
     end
 
@@ -262,20 +193,7 @@ local function Build(container)
     targetDropdown:SetCallback("OnValueChanged", function(_, _, value)
         if Messages:Update(selectedId, { target = value }) then
             widgets.RefreshList()
-            widgets.RefreshBroadcastFields()
             UpdatePreview()
-        end
-    end)
-    channelDropdown:SetCallback("OnValueChanged", function(_, _, value)
-        Messages:Update(selectedId, { channel = value })
-    end)
-    intervalSlider:SetCallback("OnValueChanged", function(_, _, value)
-        Messages:Update(selectedId, { interval = value })
-    end)
-    broadcastBox:SetCallback("OnValueChanged", function(_, _, value)
-        if Messages:Update(selectedId, { broadcast = value }) then
-            lastStatus = nil
-            widgets.RefreshBroadcastStatus()
         end
     end)
     textBox:SetCallback("OnTextChanged", function(_, _, value)
@@ -284,15 +202,10 @@ local function Build(container)
 
     widgets.RefreshList()
     widgets.RefreshEditor()
-    ticker = GRB:ScheduleRepeatingTimer(function() widgets.RefreshBroadcastStatus() end, 1)
 end
 
 local function Cleanup()
     ui = nil
-    if ticker then
-        GRB:CancelTimer(ticker)
-        ticker = nil
-    end
 end
 
 GRB.MainFrame:RegisterTab("Messages", L["Messages"], Build, Cleanup)

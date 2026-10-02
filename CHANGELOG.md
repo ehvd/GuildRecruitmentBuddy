@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ## [Unreleased]
 
 ### Added
+- Broadcast tab: a list of broadcasts, each sending one channel message to one channel (dropdown of joined channels) at its own interval, with an active checkbox, live state and cooldown, Send now (sends immediately and restarts the timer) and Remove. Add several broadcasts to send the same message to multiple channels. A master on/off checkbox controls all of them, and the Broadcast ready popup has buttons to disable that broadcast or all broadcasting. The Messages tab is now only about writing the message templates.
 - Opt-out detection: when a player you contacted replies with a configurable phrase (default: no thanks, not interested, stop, ...), they are marked do-not-contact automatically, with an optional chat notice. Single words only count at the start of a short reply and an exceptions list (default: no problem, no worries) avoids false positives.
 - Interval channel broadcasting: per-message channel and interval; a timer marks messages as ready and a popup, sound and key binding (`/grb send`) let you send them with the click Blizzard requires. Pauses in instances, combat and while AFK. Off by default; `/grb broadcast on|off`, minimap menu or settings.
 
@@ -14,7 +15,6 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 - Overlapping text in the Messages tab preview (counter and warning labels) and the same label layout problem in the Contacts and Scanner tabs.
 
 ### Changed
-- The broadcast channel of a message is picked from a dropdown of the channels you have joined instead of typed in.
 - Development tasks moved to a `Makefile` (`make libs`, `lint`, `install`, `link`, `uninstall`, `clean`), replacing `scripts/fetch-libs.ps1`.
 
 ## [0.1.0] - 2026-10-02

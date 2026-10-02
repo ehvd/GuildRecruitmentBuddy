@@ -5,8 +5,6 @@ local Messages = GRB:NewModule("Messages")
 GRB.Messages = Messages
 
 Messages.MAX_LENGTH = 255
-Messages.DEFAULT_INTERVAL = 10   -- minutes between broadcasts of a channel message
-Messages.MAX_INTERVAL = 60
 Messages.TARGETS = { "whisper", "channel" }
 
 local KNOWN_PLACEHOLDERS = { name = true, class = true, level = true, guild = true, discord = true }
@@ -58,31 +56,19 @@ function Messages:Add(name, target, text)
         name = name or L["New message"],
         target = IsValidTarget(target) and target or "whisper",
         text = text or "",
-        channel = "",                         -- channel name for broadcasts, e.g. "Trade"
-        interval = Messages.DEFAULT_INTERVAL,   -- minutes
-        broadcast = false,                      -- repeat this message (channel messages only)
     }
     profile.nextMessageId = profile.nextMessageId + 1
     tinsert(profile.messages, msg)
     return msg
 end
 
--- fields may contain name, target, text, channel, interval and broadcast
+-- fields may contain name, target and text
 function Messages:Update(id, fields)
     local msg = self:Get(id)
     if not msg then return nil end
     if fields.name ~= nil then msg.name = fields.name end
     if fields.text ~= nil then msg.text = fields.text end
     if fields.target ~= nil and IsValidTarget(fields.target) then msg.target = fields.target end
-    if fields.channel ~= nil then msg.channel = strtrim(fields.channel) end
-    if fields.interval ~= nil then
-        msg.interval = min(max(floor(fields.interval), 1), self.MAX_INTERVAL)
-    end
-    if fields.broadcast ~= nil then msg.broadcast = fields.broadcast and true or false end
-
-    if GRB.Broadcast and (fields.target ~= nil or fields.channel ~= nil or fields.interval ~= nil or fields.broadcast ~= nil) then
-        GRB.Broadcast:OnMessageChanged(id, fields)
-    end
     return msg
 end
 
@@ -90,7 +76,7 @@ function Messages:Delete(id)
     local index = self:IndexOf(id)
     if not index then return false end
     tremove(GRB.db.profile.messages, index)
-    if GRB.Broadcast then GRB.Broadcast:OnMessageChanged(id) end
+    if GRB.Broadcast then GRB.Broadcast:OnMessageDeleted(id) end
     return true
 end
 
