@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Changed
+- Settings > Welcome flow: the welcome message box now documents the placeholders (including what happens when the class or level is unknown) and shows a live preview with a sample player, a length counter and warnings.
+
 ## [0.6.0] - 2026-10-02
 
 ### Added

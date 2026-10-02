@@ -69,6 +69,7 @@ L["Channel"] = true
 L["Channel message"] = true
 L["Message text"] = true
 L["Placeholders: {name} {class} {level} {guild} {discord}"] = true
+L["{class} and {level} are only known for players in your contact database. An unknown {class} becomes \"adventurer\", and the welcome is skipped when it uses {level} and the level is unknown."] = true
 L["Preview"] = true
 L["New message"] = true
 L["Guild invite (whisper)"] = true
