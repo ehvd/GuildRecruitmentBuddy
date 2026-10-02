@@ -22,6 +22,7 @@ BINDING_NAME_GUILDRECRUITMENTBUDDY_SEND = L["Send the ready channel broadcast"]
 local defaults = {
     profile = {
         minimap = { hide = false },
+        contextMenu = true,         -- "Recruit" entry in the right-click menu of players
         autoInvite = {
             enabled = false,
             onlyContacted = false,      -- true: only handle ginv from players the addon whispered

@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ## [Unreleased]
 
 ### Added
+- Right-click recruiting: the right-click menu of players (chat names, target, party and raid, friends) has a "GRB" section with a "Recruit" submenu listing your whisper templates; choosing one whispers that player through the normal checks (cooldown, opt-out list, rate limit), and the menu says why when the player cannot be whispered. Only shown for guildless players: hidden for yourself and for anyone known to be in a guild (visible players such as your target or group, anyone a `/who` has shown, your own guild). For other names, such as someone in chat, the guild is checked with `/who` when you pick a template and the whisper is only sent if they are guildless. Can be switched off in Settings > General.
 - Leads: the addon keeps the last replies of players it contacted, and replies that sound interested but not ready (configurable phrases such as "maybe", "later", "tell me more"; opt-outs never count) turn the player into a **lead**. The new Leads tab lists every lead with the saved reply and its date, with follow-up Whisper, Invite and Remove buttons. Leads are never pruned or purged. Set one by hand with `/grb lead <name> [message]` or the Lead status in the Contacts tab; `/grb leads` opens the tab. Replies are stored locally and are not shared by the officer sync.
 
 ## [0.4.0] - 2026-10-02

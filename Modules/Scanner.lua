@@ -82,6 +82,45 @@ local function Disengage()
 end
 
 ---------------------------------------------------------------------------
+-- Known guilds
+---------------------------------------------------------------------------
+
+-- Every player a /who returns (guilded or not) is remembered for a while, so the right-click menu
+-- (UI/ContextMenu.lua) can tell whether a name from chat or the friends list is guildless.
+local GUILD_CACHE_TTL = 1800    -- seconds
+local GUILD_CACHE_MAX = 2000
+local guildCache = {}           -- "Name-Realm" -> { guild = "Name" or false (guildless), at = GetTime() }
+local guildCacheSize = 0
+
+function Scanner:RememberGuild(key, guild)
+    if not key then return end
+    if not guildCache[key] then
+        guildCacheSize = guildCacheSize + 1
+        if guildCacheSize > GUILD_CACHE_MAX then
+            wipe(guildCache)
+            guildCacheSize = 1
+        end
+    end
+    guildCache[key] = { guild = guild, at = GetTime() }
+end
+
+-- Returns the guild name of a player when it is known, false when the player is known to be guildless and nil
+-- when nothing is known. A visible unit (target, party member, ...) tells its guild directly.
+function Scanner:GetKnownGuild(key, unit)
+    if GRB.Contacts:IsInGuild(key) then
+        return (GetGuildInfo("player")) or true
+    end
+    if unit and UnitExists(unit) and UnitIsPlayer(unit) and UnitIsVisible(unit) then
+        return (GetGuildInfo(unit)) or false
+    end
+    local entry = guildCache[key]
+    if entry and GetTime() - entry.at < GUILD_CACHE_TTL then
+        return entry.guild
+    end
+    return nil
+end
+
+---------------------------------------------------------------------------
 -- Queue
 ---------------------------------------------------------------------------
 
@@ -230,6 +269,29 @@ function Scanner:RunNext()
     return true
 end
 
+-- Looks one player up with /who n-"Name" to learn their guild. Must be called from a click (hardware event).
+-- callback(guild): the guild name, false when the player is guildless, nil when the player was not found
+-- (offline) or the server did not answer. Returns true, or false and the reason it cannot run now.
+function Scanner:LookupPlayer(name, callback)
+    local key = GRB.Contacts:Key(name)
+    if not key then return false, L["Enter a player name."] end
+    if pending then
+        return false, L["Waiting for the server..."]
+    end
+    local wait = nextAllowed - GetTime()
+    if wait > 0 then
+        return false, format(L["Wait %d s (server throttle)."], ceil(wait))
+    end
+
+    pending = { lookup = true, key = key, callback = callback }
+    Engage()
+    nextAllowed = GetTime() + MIN_INTERVAL
+    C_FriendList.SendWho(format("n-\"%s\"", (GRB.Contacts:SplitKey(key))))
+    timeoutTimer = self:ScheduleTimer("OnTimeout", RESPONSE_TIMEOUT)
+    self:Notify()
+    return true
+end
+
 ---------------------------------------------------------------------------
 -- Results
 ---------------------------------------------------------------------------
@@ -268,17 +330,33 @@ function Scanner:OnWhoListUpdate()
     end
 
     local count = C_FriendList.GetNumWhoResults()
+    local found, foundGuild   -- answer of a single-player lookup
     for i = 1, count do
         local info = C_FriendList.GetWhoInfo(i)
         if info then
-            stats.scanned = stats.scanned + 1
-            if not info.fullGuildName or info.fullGuildName == "" then
-                AddResult(info)
+            local key = GRB.Contacts:Key(info.fullName)
+            local guild = (info.fullGuildName and info.fullGuildName ~= "") and info.fullGuildName or false
+            self:RememberGuild(key, guild)
+            if query.lookup then
+                if key == query.key then found, foundGuild = true, guild end
+            else
+                stats.scanned = stats.scanned + 1
+                if not guild then
+                    AddResult(info)
+                end
             end
         end
     end
     Disengage()
 
+    if query.lookup then
+        -- guild name / false (guildless) when the player was found, nil when not (a plain 'and/or' would turn false into nil)
+        local result
+        if found then result = foundGuild end
+        query.callback(result)
+        self:Notify()
+        return
+    end
     -- A full page means players were cut off: split the level range and query both halves next.
     if count >= MAX_RESULTS then
         if query.lo < query.hi then
@@ -297,7 +375,9 @@ function Scanner:OnTimeout()
     local query = pending
     pending = nil
     Disengage()
-    if query then
+    if query and query.lookup then
+        query.callback(nil)
+    elseif query then
         stats.failed = stats.failed + 1
         if query.retries < MAX_RETRIES then
             query.retries = query.retries + 1

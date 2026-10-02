@@ -29,7 +29,15 @@ local function GetOptions()
                             GRB:UpdateMinimapButton()
                         end,
                     },
-                    discord = {
+                    contextMenu = {
+                        type = "toggle",
+                        name = L["Add a Recruit entry to the right-click menu of players"],
+                        desc = L["Right-click a name (chat, target, party, friends) to whisper a template to that player."],
+                        order = 2.5,
+                        width = "full",
+                        get = function() return db.contextMenu end,
+                        set = function(_, value) db.contextMenu = value end,
+                    },                    discord = {
                         type = "input",
                         name = L["Discord link ({discord})"],
                         order = 3,

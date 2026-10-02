@@ -45,7 +45,7 @@ read_globals = {
     -- Game API
     "C_Timer", "C_FriendList", "C_GuildInfo", "C_ChatInfo",
     "SendChatMessage", "GetGuildInfo", "GetNumGuildMembers", "GetGuildRosterInfo",
-    "GuildRoster", "IsInGuild", "CanGuildInvite", "GuildInvite", "GetRealmName", "UnitFactionGroup", "C_CreatureInfo", "ERR_GUILD_JOIN_S", "GetBindingKey", "UnitAffectingCombat", "InterfaceOptionsFrame_OpenToCategory", "FriendsFrame", "GetPlayerInfoByGUID", "GetNormalizedRealmName", "UnitName",
+    "GuildRoster", "IsInGuild", "CanGuildInvite", "GuildInvite", "GetRealmName", "UnitIsVisible", "Menu", "UnitFullName", "UnitIsPlayer", "UnitIsUnit", "UnitIsEnemy", "UnitExists", "UnitLevel", "geterrorhandler", "UnitFactionGroup", "C_CreatureInfo", "ERR_GUILD_JOIN_S", "GetBindingKey", "UnitAffectingCombat", "InterfaceOptionsFrame_OpenToCategory", "FriendsFrame", "GetPlayerInfoByGUID", "GetNormalizedRealmName", "UnitName",
     "UnitLevel", "UnitClass", "UnitFactionGroup", "GetServerTime", "GetTime", "GetLocale",
     "IsInInstance", "InCombatLockdown", "UnitIsAFK", "GetNumGroupMembers", "IsInRaid",
     "GetChannelList", "GetChannelName", "Ambiguate", "FlashClientIcon", "RAID_CLASS_COLORS",
