@@ -10,7 +10,7 @@ local frame
 
 local function Create()
     frame = CreateFrame("Frame", "GuildRecruitmentBuddyBroadcastFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(300, 120)
+    frame:SetSize(330, 160)
     frame:SetPoint("TOP", UIParent, "TOP", 0, -290)
     frame:SetFrameStrata("DIALOG")
     frame:SetBackdrop({
@@ -32,26 +32,46 @@ local function Create()
 
     frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.text:SetPoint("TOP", frame.title, "BOTTOM", 0, -8)
-    frame.text:SetWidth(270)
+    frame.text:SetWidth(300)
 
     frame.hint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     frame.hint:SetPoint("TOP", frame.text, "BOTTOM", 0, -4)
-    frame.hint:SetWidth(270)
+    frame.hint:SetWidth(300)
 
     frame.send = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    frame.send:SetSize(110, 24)
-    frame.send:SetPoint("BOTTOMLEFT", frame, "BOTTOM", -115, 18)
+    frame.send:SetSize(150, 24)
+    frame.send:SetPoint("BOTTOMLEFT", frame, "BOTTOM", -155, 46)
     frame.send:SetText(L["Send"])
     frame.send:SetScript("OnClick", function()
         GRB.Broadcast:SendNext()
     end)
 
     frame.skip = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-    frame.skip:SetSize(110, 24)
-    frame.skip:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", 115, 18)
+    frame.skip:SetSize(150, 24)
+    frame.skip:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", 155, 46)
     frame.skip:SetText(L["Skip"])
     frame.skip:SetScript("OnClick", function()
         GRB.Broadcast:SkipNext()
+    end)
+
+    -- Second row: switch off this broadcast, or the whole feature
+    frame.disableEntry = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.disableEntry:SetSize(150, 24)
+    frame.disableEntry:SetPoint("BOTTOMLEFT", frame, "BOTTOM", -155, 18)
+    frame.disableEntry:SetText(L["Disable this broadcast"])
+    frame.disableEntry:SetScript("OnClick", function()
+        if frame.entryId then
+            GRB.Broadcast:UpdateEntry(frame.entryId, { active = false })
+            GRB:Print(L["Broadcast disabled. You can enable it again in the Broadcast tab."])
+        end
+    end)
+
+    frame.disableAll = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.disableAll:SetSize(150, 24)
+    frame.disableAll:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", 155, 18)
+    frame.disableAll:SetText(L["Disable broadcasting"])
+    frame.disableAll:SetScript("OnClick", function()
+        GRB.Broadcast:SetActive(false)
     end)
 
     frame:Hide()
@@ -69,6 +89,7 @@ function BroadcastFrame:Update()
     end
     if not frame then Create() end
 
+    frame.entryId = entry.id
     local channel = entry.channel ~= "" and entry.channel or "?"
     frame.text:SetText(format(L["\"%s\" to %s"], msg.name, channel))
 

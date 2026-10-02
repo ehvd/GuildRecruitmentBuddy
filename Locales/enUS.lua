@@ -204,3 +204,6 @@ L["The message was deleted or is no longer a channel message."] = true
 L["Create a channel message in the Messages tab first (Send as: Channel message)."] = true
 L["Each broadcast sends one channel message to one channel. Add several to use a message in more channels."] = true
 L["No broadcasts yet. Write a channel message in the Messages tab, then click Add broadcast."] = true
+L["Disable this broadcast"] = true
+L["Disable broadcasting"] = true
+L["Broadcast disabled. You can enable it again in the Broadcast tab."] = true
