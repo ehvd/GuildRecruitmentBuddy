@@ -41,7 +41,7 @@ end
 local launcher = LDB:NewDataObject(ADDON_NAME, {
     type = "launcher",
     text = L["ADDON_NAME"],
-    icon = "Interface\\Icons\\INV_Misc_Note_01",
+    icon = "Interface\\AddOns\\GuildRecruitmentBuddy\\Media\\icon",
     OnClick = function(_, button)
         if button == "RightButton" then
             ShowMenu()
