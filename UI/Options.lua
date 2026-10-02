@@ -149,11 +149,58 @@ local function GetOptions()
     }
 end
 
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local AceGUI = LibStub("AceGUI-3.0")
+local registry = LibStub("AceConfigRegistry-3.0")
+
+local settingsContainer  -- AceGUI container holding the options while the Settings tab is shown
+local SettingsTab = {}
+
 function GRB:SetupOptions()
     LibStub("AceConfig-3.0"):RegisterOptionsTable(ADDON_NAME, GetOptions)
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(ADDON_NAME, L["ADDON_NAME"])
+    self.blizOptionsFrame = AceConfigDialog:AddToBlizOptions(ADDON_NAME, L["ADDON_NAME"])
 end
 
+-- /grb config: the options inside the main window
 function GRB:OpenConfig()
-    LibStub("AceConfigDialog-3.0"):Open(ADDON_NAME)
+    self.MainFrame:Open("Settings")
 end
+
+-- /grb options: the same options in Blizzard's Interface Options
+function GRB:OpenBlizzardOptions()
+    if InterfaceOptionsFrame_OpenToCategory then
+        -- Called twice on purpose: the first call only opens the panel on the wrong category (known Blizzard bug)
+        InterfaceOptionsFrame_OpenToCategory(self.blizOptionsFrame)
+        InterfaceOptionsFrame_OpenToCategory(self.blizOptionsFrame)
+    elseif Settings and Settings.OpenToCategory then
+        Settings.OpenToCategory(self.blizOptionsFrame.name)
+    end
+end
+
+-- AceConfigDialog does not refresh options embedded in custom containers, so do it here.
+function SettingsTab:ConfigTableChanged(_, appName)
+    if appName ~= ADDON_NAME or not settingsContainer then return end
+    C_Timer.After(0, function()
+        if settingsContainer then
+            AceConfigDialog:Open(ADDON_NAME, settingsContainer)
+        end
+    end)
+end
+registry.RegisterCallback(SettingsTab, "ConfigTableChange", "ConfigTableChanged")
+
+local function BuildSettings(container)
+    container:SetLayout("Fill")
+    local group = AceGUI:Create("SimpleGroup")
+    group:SetLayout("Fill")
+    group:SetFullWidth(true)
+    group:SetFullHeight(true)
+    container:AddChild(group)
+    settingsContainer = group
+    AceConfigDialog:Open(ADDON_NAME, group)
+end
+
+local function CleanupSettings()
+    settingsContainer = nil
+end
+
+GRB.MainFrame:RegisterTab("Settings", L["Settings"], BuildSettings, CleanupSettings)

@@ -15,7 +15,8 @@ a memory of who was already contacted, "ginv" auto-invite and a guildless-player
 | `/grb` | Open the main window |
 | `/grb invite on\|off` | Toggle the keyword auto-invite |
 | `/grb scan` | Open the scanner tab |
-| `/grb config` | Open the settings panel |
+| `/grb config` | Open the Settings tab |
+| `/grb options` | Open the settings in Blizzard's Interface Options |
 
 `/guildrecruitmentbuddy` is an alias for `/grb`.
 

@@ -10,8 +10,6 @@ L["on"] = true
 L["off"] = true
 L["Left-click: open window"] = true
 L["Right-click: menu"] = true
-L["The main window is not available yet."] = true
-L["Scanner is not available yet."] = true
 L["Show minimap button"] = true
 L["General"] = true
 L["Usage:"] = true
@@ -19,6 +17,7 @@ L["/grb - open the main window"] = true
 L["/grb invite on|off - toggle keyword auto invite"] = true
 L["/grb scan - open the scanner"] = true
 L["/grb config - open settings"] = true
+L["/grb options - open the Blizzard options panel"] = true
 
 -- Settings
 L["Discord link ({discord})"] = true
