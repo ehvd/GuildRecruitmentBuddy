@@ -29,4 +29,5 @@ ignore:
   - .gitattributes
   - CONTRIBUTING.md
   - README.md
+  - icon.png
   - tests
