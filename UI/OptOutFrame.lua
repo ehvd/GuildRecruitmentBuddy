@@ -66,12 +66,12 @@ local function Create()
     frame.confirm = CreateButton(L["Opt out"], function()
         GRB.OptOut:ConfirmNext()
     end)
-    frame.confirm:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -GAP / 2, BOTTOM_PADDING)
+    frame.confirm:SetPoint("BOTTOMLEFT", frame, "BOTTOM", GAP / 2, BOTTOM_PADDING)
 
     frame.skip = CreateButton(L["Skip"], function()
         GRB.OptOut:SkipNext()
     end)
-    frame.skip:SetPoint("BOTTOMLEFT", frame, "BOTTOM", GAP / 2, BOTTOM_PADDING)
+    frame.skip:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -GAP / 2, BOTTOM_PADDING)
 
     frame:Hide()
 end
