@@ -1,5 +1,5 @@
 # Libraries are fetched by the packager / scripts/fetch-libs.ps1
-GuildRecruitmentBuddy/Libs/
+Libs/
 *.zip
 .release/
 .idea/
