@@ -332,6 +332,41 @@ local function GetOptions()
                         name = L["Switch quiet mode on by hand with /grb quiet on and off with /grb quiet off."],
                     },
                 },
+            },            sync = {
+                type = "group",
+                name = L["Officer sync"],
+                order = 7,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["Shares contacts with guild members who can invite, so recruiters never whisper the same player."],
+                    },
+                    enabled = {
+                        type = "toggle",
+                        name = L["Enable officer sync"],
+                        order = 1,
+                        width = "full",
+                        get = function() return db.sync.enabled end,
+                        set = function(_, value)
+                            db.sync.enabled = value
+                            if value then GRB.Sync:TryAnnounce() end
+                        end,
+                    },
+                    status = {
+                        type = "description",
+                        order = 2,
+                        name = function() return GRB.Sync:GetSummary() end,
+                    },
+                    force = {
+                        type = "execute",
+                        name = L["Force full sync"],
+                        desc = L["Forget what was received before and exchange all contacts with every online recruiter."],
+                        order = 3,
+                        disabled = function() return not GRB.Sync:CanSync() end,
+                        func = function() GRB.Sync:ForceSync() end,
+                    },
+                },
             },            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),
         },
     }

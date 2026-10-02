@@ -22,6 +22,7 @@ Modules\AutoInvite.lua
 Modules\Scanner.lua
 Modules\OptOut.lua
 Modules\Welcome.lua
+Modules\Sync.lua
 Modules\Broadcast.lua
 
 UI\InviteFrame.lua

@@ -38,7 +38,7 @@ Libs/.fetched: Makefile
 	@mkdir -p Libs .libs-tmp
 	@git clone --quiet --depth 1 https://github.com/WoWUIDev/Ace3.git .libs-tmp/ace3
 	@for lib in LibStub CallbackHandler-1.0 AceAddon-3.0 AceDB-3.0 AceDBOptions-3.0 AceConsole-3.0 \
-	    AceEvent-3.0 AceTimer-3.0 AceComm-3.0 AceConfig-3.0 AceGUI-3.0 AceLocale-3.0; do \
+	    AceEvent-3.0 AceTimer-3.0 AceComm-3.0 AceSerializer-3.0 AceConfig-3.0 AceGUI-3.0 AceLocale-3.0; do \
 	  cp -r ".libs-tmp/ace3/$$lib" "Libs/$$lib" || exit 1; \
 	done
 	@git clone --quiet --depth 1 https://github.com/tekkub/libdatabroker-1-1.git .libs-tmp/ldb

@@ -23,6 +23,7 @@ for index, status in ipairs(Contacts.STATUSES) do
 end
 
 local guildKeys = {}       -- "Name-Realm" -> true for every member of our guild
+local guildOnline = {}     -- "Name-Realm" -> true / false (online) for every member of our guild
 local lastRosterRequest = 0
 
 ---------------------------------------------------------------------------
@@ -88,14 +89,55 @@ function Contacts:Record(name, info)
             contact[field] = info[field]
         end
     end
+    self:Touch(key)
     return contact, key
+end
+
+-- Marks a contact as changed locally: stamps it for the officer sync and shares it with the other recruiters.
+function Contacts:Touch(key)
+    local contact = GRB.db.global.contacts[key]
+    if not contact then return end
+    contact.updated = GetServerTime()
+    if GRB.Sync then GRB.Sync:OnLocalChange(key) end
+end
+
+-- When a contact was last changed (contacts from before the sync existed fall back to the last contact time)
+function Contacts:UpdatedOf(contact)
+    return contact.updated or contact.timestamp or 0
+end
+
+-- Applies a contact received from another recruiter. The newest change wins; on a tie the status that
+-- protects the player best (higher in STATUSES, do-not-contact last) wins. Does not touch the sync again.
+-- data: { status, timestamp, class, level, templateName, updated }. Returns true when it changed anything.
+function Contacts:ApplyRemote(key, data)
+    local contacts = GRB.db.global.contacts
+    local contact = contacts[key]
+    if contact then
+        local localUpdated = self:UpdatedOf(contact)
+        if data.updated < localUpdated then return false end
+        if data.updated == localUpdated and (STATUS_INDEX[data.status] or 0) <= (STATUS_INDEX[contact.status] or 0) then
+            return false
+        end
+    else
+        local short, realm = self:SplitKey(key)
+        contact = { name = short, realm = realm }
+        contacts[key] = contact
+    end
+    contact.status = data.status
+    contact.timestamp = data.timestamp
+    contact.class = data.class
+    contact.level = data.level
+    contact.templateName = data.templateName
+    contact.updated = data.updated
+    return true
 end
 
 function Contacts:SetStatus(name, status)
     if not STATUS_INDEX[status] then return false end
-    local contact = self:Get(name)
+    local contact, key = self:Get(name)
     if contact then
         contact.status = status
+        self:Touch(key)
     else
         self:Record(name, { status = status, timestamp = GetServerTime() })
     end
@@ -217,20 +259,28 @@ end
 
 function Contacts:RebuildGuildCache()
     wipe(guildKeys)
+    wipe(guildOnline)
     if not IsInGuild() then return end
     for i = 1, (GetNumGuildMembers()) do
-        local name = GetGuildRosterInfo(i)
+        local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
         local key = name and self:Key(name)
         if key then
             guildKeys[key] = true
+            guildOnline[key] = online and true or false
         end
     end
 end
 
+-- true / false when the guild roster says the member is online / offline, nil when unknown
+function Contacts:IsOnline(key)
+    return guildOnline[key]
+end
+
 function Contacts:OnWhisper(_, _, sender)
-    local contact = self:Get(sender)
+    local contact, key = self:Get(sender)
     if contact and contact.status == "contacted" then
         contact.status = "replied"
+        self:Touch(key)
     end
 end
 
