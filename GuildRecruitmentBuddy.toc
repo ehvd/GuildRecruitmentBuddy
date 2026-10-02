@@ -1,0 +1,17 @@
+## Interface: 11509
+## Title: GuildRecruitmentBuddy
+## Notes: Guild recruitment helper: message templates, contact memory, ginv auto-invite and a guildless-player scanner.
+## Author: ehvd
+## Version: @project-version@
+## SavedVariables: GuildRecruitmentBuddyDB
+## IconTexture: Interface\Icons\INV_Misc_Note_01
+## Category: Social
+
+embeds.xml
+
+Locales\enUS.lua
+
+Core.lua
+
+UI\Options.lua
+UI\Minimap.lua
