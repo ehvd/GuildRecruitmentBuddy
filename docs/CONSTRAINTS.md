@@ -61,7 +61,7 @@ Source: <https://warcraft.wiki.gg/wiki/ChatThrottleLib>
 Addon messages (`SendAddonMessage` through AceComm) are not hardware-event restricted and are throttled by ChatThrottleLib. The sync uses the prefix `GRBSync`:
 
 - `hello` is broadcast on the `GUILD` addon channel and says only "I can invite" plus which of each peer's changes this client already has; it carries no contacts.
-- Contacts are sent as direct `WHISPER` addon messages to the peers that announced invite permission, so non-recruiters never receive them. Peers the guild roster lists as offline are skipped (an addon whisper to an offline player produces a system error message).
+- Contacts are sent as direct `WHISPER` addon messages to the peers that announced invite permission, so non-recruiters never receive them. Peers the guild roster lists as offline are skipped (an addon whisper to an offline player prints a "Player is offline." system message).
 - Invite permission is self-declared by the other client (`CanGuildInvite()`); the roster does not expose other members' rank permissions to addons.
 
 Sources: <https://warcraft.wiki.gg/wiki/API_C_ChatInfo.SendAddonMessage>, <https://warcraft.wiki.gg/wiki/API_CanGuildInvite>
