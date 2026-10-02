@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   package:
@@ -39,3 +40,27 @@ jobs:
             echo
             cat docs/curseforge.md
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # Nothing to do when the description is unchanged since the previous full release. Otherwise an issue
+      # assigned to the repository owner is the notification that the CurseForge description needs pasting.
+      - name: Open an issue when the CurseForge description changed
+        if: ${{ !contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}
+        run: |
+          previous=$(git describe --tags --abbrev=0 --exclude='*-*' "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          if [ -n "$previous" ] && git diff --quiet "$previous" "$GITHUB_REF_NAME" -- docs/curseforge.md; then
+            echo "The CurseForge description is unchanged since $previous."
+            exit 0
+          fi
+          gh issue create \
+            --title "Update the CurseForge description for $GITHUB_REF_NAME" \
+            --assignee "$OWNER" \
+            --label "type: docs" \
+            --body "docs/curseforge.md changed since ${previous:-the first release}. CurseForge cannot be updated by CI, so please paste it:
+
+          1. Run \`make description\` (clipboard) or download \`curseforge-description.md\` from $RELEASE_URL
+          2. Paste it into the project description on CurseForge and save
+          3. Close this issue"

@@ -49,4 +49,5 @@ optional scope, e.g. `feat(scanner): slice queries by level`.
 1. Review `docs/curseforge.md` (the CurseForge project description) in the release PR and update it for new features and the roadmap. CurseForge has no API to edit a description, so it cannot be published automatically.
 2. Bump `CHANGELOG.md` (`release/x.y.z`), merge, fast-forward `main` and tag `vx.y.z`.
 3. The Release workflow uploads the file to CurseForge and GitHub and, for full releases, attaches the description as `curseforge-description.md` to the GitHub release and prints it in the job summary.
-4. Paste it into the project description on CurseForge: run `make description` (clipboard) or copy it from the job summary.
+4. If `docs/curseforge.md` changed since the previous release, the workflow opens an issue assigned to the repository owner (so GitHub notifies them); nothing is opened when the text is unchanged.
+5. Paste it into the project description on CurseForge: run `make description` (clipboard) or copy it from the job summary, then close the issue.
