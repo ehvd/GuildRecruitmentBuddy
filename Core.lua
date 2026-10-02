@@ -45,6 +45,9 @@ local defaults = {
                 "leave me alone, dont whisper me, dont message me, remove me, unsubscribe",
             exceptions = "no problem, no worries",   -- replies starting with these are never an opt-out
         },
+        broadcastEntries = {},      -- see Modules/Broadcast.lua: { id, messageId, channel, interval, active }
+        nextBroadcastId = 1,
+        broadcastMigrated = false,
         broadcast = {
             active = false,         -- master switch, off by default (/grb broadcast on|off)
             sound = true,           -- sound when a broadcast becomes ready

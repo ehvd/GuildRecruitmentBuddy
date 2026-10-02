@@ -61,14 +61,15 @@ end
 function BroadcastFrame:Update()
     local broadcast = GRB.Broadcast
     local id = broadcast:GetReady()[1]
-    local msg = id and GRB.Messages:Get(id)
+    local entry = id and broadcast:GetEntry(id)
+    local msg = entry and broadcast:GetMessage(entry)
     if not msg or not broadcast:IsActive() or broadcast:GetPauseReason() then
         if frame then frame:Hide() end
         return
     end
     if not frame then Create() end
 
-    local channel = msg.channel ~= "" and msg.channel or "?"
+    local channel = entry.channel ~= "" and entry.channel or "?"
     frame.text:SetText(format(L["\"%s\" to %s"], msg.name, channel))
 
     local key = GetBindingKey("GUILDRECRUITMENTBUDDY_SEND")
