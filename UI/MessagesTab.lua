@@ -116,11 +116,10 @@ local function Build(container)
     -- Interval broadcasting (channel messages) -------------------------------
     scroll:AddChild(Heading(L["Interval broadcasting"]))
 
-    local channelBox = AceGUI:Create("EditBox")
-    channelBox:SetLabel(L["Channel"])
-    channelBox:SetRelativeWidth(0.34)
-    channelBox:DisableButton(true)
-    scroll:AddChild(channelBox)
+    local channelDropdown = AceGUI:Create("Dropdown")
+    channelDropdown:SetLabel(L["Channel"])
+    channelDropdown:SetRelativeWidth(0.34)
+    scroll:AddChild(channelDropdown)
 
     local intervalSlider = AceGUI:Create("Slider")
     intervalSlider:SetLabel(L["Every (minutes)"])
@@ -133,8 +132,6 @@ local function Build(container)
     broadcastBox:SetRelativeWidth(0.24)
     scroll:AddChild(broadcastBox)
 
-    local joinedNames = GRB.Broadcast:GetJoinedChannels()
-    scroll:AddChild(Label(format(L["Joined channels: %s"], #joinedNames > 0 and table.concat(joinedNames, ", ") or L["none"])))
     local broadcastStatus = Label()
     scroll:AddChild(broadcastStatus)
 
@@ -193,13 +190,32 @@ local function Build(container)
         end
     end
 
+    -- Lists the channels joined right now; a saved channel that is not joined stays selectable.
+    local function RefreshChannelList(msg)
+        local values, order = {}, {}
+        local current = msg and msg.channel or ""
+        local selected
+        for _, name in ipairs(Broadcast:GetJoinedChannels()) do
+            values[name] = name
+            tinsert(order, name)
+            if name:lower() == current:lower() then selected = name end
+        end
+        if current ~= "" and not selected then
+            values[current] = format(L["%s (not joined)"], current)
+            tinsert(order, current)
+            selected = current
+        end
+        channelDropdown:SetList(values, order)
+        channelDropdown:SetValue(selected)
+    end
+
     function widgets.RefreshBroadcastFields()
         local msg = Messages:Get(selectedId)
         local isChannel = msg ~= nil and msg.target == "channel"
-        channelBox:SetDisabled(not isChannel)
+        channelDropdown:SetDisabled(not isChannel)
         intervalSlider:SetDisabled(not isChannel)
         broadcastBox:SetDisabled(not isChannel)
-        channelBox:SetText(msg and msg.channel or "")
+        RefreshChannelList(msg)
         intervalSlider:SetValue(msg and msg.interval or Messages.DEFAULT_INTERVAL)
         broadcastBox:SetValue(msg ~= nil and msg.broadcast == true)
         lastStatus = nil
@@ -250,7 +266,7 @@ local function Build(container)
             UpdatePreview()
         end
     end)
-    channelBox:SetCallback("OnTextChanged", function(_, _, value)
+    channelDropdown:SetCallback("OnValueChanged", function(_, _, value)
         Messages:Update(selectedId, { channel = value })
     end)
     intervalSlider:SetCallback("OnValueChanged", function(_, _, value)
