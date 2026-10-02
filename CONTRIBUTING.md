@@ -32,7 +32,7 @@ and merge `--no-ff` back into `develop`.
 
 - One issue → one feature branch → one PR into `develop` with `Closes #N`.
 - Update `[Unreleased]` in `CHANGELOG.md` in every PR.
-- `luacheck .` must pass locally before pushing.
+- `make lint` (`luacheck .`) must pass locally before pushing; `make install` or `make link` put the addon into your AddOns folder (see the README).
 - Never commit `Libs/` or any secret.
 
 ## Commit conventions

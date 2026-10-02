@@ -10,7 +10,9 @@ GRB.L = L
 GRB.CLASSES = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID" }
 
 local getMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
-GRB.version = getMetadata(ADDON_NAME, "Version") or "dev"
+local version = getMetadata(ADDON_NAME, "Version")
+-- "@project-version@" is only substituted by the packager / `make install`; a linked dev checkout keeps it
+GRB.version = (version and not version:find("@", 1, true)) and version or "dev"
 
 -- profile: settings (shared by all characters), global: contacts keyed by "Name-Realm"
 local defaults = {
