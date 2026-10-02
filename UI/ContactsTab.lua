@@ -233,12 +233,14 @@ local function Build(container)
         pageLabel:SetText(format(L["Page %d / %d (%d contacts)"], state.page, pages, #entries))
         prevButton:SetDisabled(state.page <= 1)
         nextButton:SetDisabled(state.page >= pages)
+        scroll:DoLayout()
     end
 
     function widgets.RefreshWhisper()
         local ok, why = GRB.Whisper:CanSend(state.whisperName, state.templateId)
         sendButton:SetDisabled(not ok)
         reason:SetText(ok and "" or ("|cffff6060" .. why .. "|r"))
+        scroll:DoLayout()
     end
 
     local function RefreshTemplates()

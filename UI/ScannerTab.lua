@@ -237,7 +237,10 @@ local function Build(container)
         nextPageButton:SetDisabled(state.page >= pages)
         whisperAllButton:SetDisabled(#sorted == 0 or not state.templateId)
         summaryLabel:SetText(summary)
+        scroll:DoLayout()
     end
+
+    local lastStatus
 
     function widgets.RefreshControls()
         local stats = Scanner:GetStats()
@@ -262,7 +265,13 @@ local function Build(container)
         if stats.failed > 0 then
             tinsert(lines, "|cffffd100" .. format(L["%d queries got no response from the server."], stats.failed) .. "|r")
         end
-        status:SetText(table.concat(lines, "\n"))
+        -- Runs every 0.5 s for the countdown, so only re-layout when the text changed
+        local text = table.concat(lines, "\n")
+        if text ~= lastStatus then
+            lastStatus = text
+            status:SetText(text)
+            scroll:DoLayout()
+        end
     end
 
     local function RefreshTemplates()
