@@ -11,6 +11,7 @@ local MAX_LEVEL = 60
 local state = {
     page = 1,
     templateId = nil,
+    raceFilter = "all",   -- race shown in the results (a race name, or "all")
 }
 
 local ticker       -- repeating timer that keeps the throttle countdown current
@@ -59,6 +60,7 @@ local function Build(container)
     intro:SetFullWidth(true)
     scroll:AddChild(intro)
 
+    scroll:AddChild(Heading(L["Classes"]))
     for _, token in ipairs(GRB.CLASSES) do
         local box = AceGUI:Create("CheckBox")
         box:SetLabel(LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[token] or token)
@@ -70,6 +72,20 @@ local function Build(container)
         scroll:AddChild(box)
     end
 
+    -- Races of the player's own faction; nothing checked searches every race
+    scroll:AddChild(Heading(L["Races (none selected = all)"]))
+    for _, token in ipairs(Scanner:GetRaces()) do
+        local box = AceGUI:Create("CheckBox")
+        box:SetLabel(Scanner:GetRaceName(token))
+        box:SetValue(settings.races[token] == true)
+        box:SetRelativeWidth(0.25)
+        box:SetCallback("OnValueChanged", function(_, _, value)
+            settings.races[token] = value or nil
+        end)
+        scroll:AddChild(box)
+    end
+
+    scroll:AddChild(Heading(L["Level and zone"]))
     local minSlider = AceGUI:Create("Slider")
     local maxSlider = AceGUI:Create("Slider")
     for _, slider in ipairs({ minSlider, maxSlider }) do
@@ -134,11 +150,16 @@ local function Build(container)
 
     local whisperAllButton = AceGUI:Create("Button")
     whisperAllButton:SetText(L["Whisper all eligible"])
-    whisperAllButton:SetRelativeWidth(0.4)
+    whisperAllButton:SetRelativeWidth(0.3)
     scroll:AddChild(whisperAllButton)
 
+    local raceDropdown = AceGUI:Create("Dropdown")
+    raceDropdown:SetLabel(L["Show race"])
+    raceDropdown:SetRelativeWidth(0.3)
+    scroll:AddChild(raceDropdown)
+
     local summaryLabel = AceGUI:Create("Label")
-    summaryLabel:SetRelativeWidth(0.58)
+    summaryLabel:SetRelativeWidth(0.38)
     scroll:AddChild(summaryLabel)
 
     local list = AceGUI:Create("SimpleGroup")
@@ -161,9 +182,14 @@ local function Build(container)
     scroll:AddChild(nextPageButton)
 
     -- Behaviour --------------------------------------------------------------
+    -- Results of the chosen race filter, highest level first
     local function SortedResults()
         local sorted = {}
-        for _, result in ipairs(Scanner:GetResults()) do tinsert(sorted, result) end
+        for _, result in ipairs(Scanner:GetResults()) do
+            if state.raceFilter == "all" or result.race == state.raceFilter then
+                tinsert(sorted, result)
+            end
+        end
         table.sort(sorted, function(a, b)
             if (a.level or 0) ~= (b.level or 0) then return (a.level or 0) > (b.level or 0) end
             return a.key < b.key
@@ -175,8 +201,9 @@ local function Build(container)
         local statusText, eligible = RowStatus(result)
 
         local info = AceGUI:Create("Label")
-        info:SetText(format("%s  %s %s  |cff999999%s|r\n%s",
-            ClassColored(result.name, result.token), result.class or "?", result.level or "?", result.zone or "", statusText))
+        info:SetText(format("%s  %s %s %s  |cff999999%s|r\n%s",
+            ClassColored(result.name, result.token), result.race or "?", result.class or "?", result.level or "?",
+            result.zone or "", statusText))
         info:SetRelativeWidth(0.52)
         list:AddChild(info)
 
@@ -221,7 +248,27 @@ local function Build(container)
         list:AddChild(block)
     end
 
+    -- The race filter lists the races found so far; a filter whose race is gone (new scan) falls back to all
+    local function RefreshRaceFilter()
+        local values, order, found = { all = L["All races"] }, { "all" }, {}
+        for _, result in ipairs(Scanner:GetResults()) do
+            if result.race and not found[result.race] then
+                found[result.race] = true
+                tinsert(order, result.race)
+                values[result.race] = result.race
+            end
+        end
+        table.sort(order, function(a, b)
+            if a == "all" or b == "all" then return a == "all" and b ~= "all" end
+            return a < b
+        end)
+        if not values[state.raceFilter] then state.raceFilter = "all" end
+        raceDropdown:SetList(values, order)
+        raceDropdown:SetValue(state.raceFilter)
+    end
+
     function widgets.RefreshResults()
+        RefreshRaceFilter()
         local sorted = SortedResults()
         local pages = max(1, ceil(#sorted / PAGE_SIZE))
         state.page = min(max(state.page, 1), pages)
@@ -293,6 +340,11 @@ local function Build(container)
         state.templateId = value
         widgets.RefreshResults()
     end)
+    raceDropdown:SetCallback("OnValueChanged", function(_, _, value)
+        state.raceFilter = value
+        state.page = 1
+        widgets.RefreshResults()
+    end)
     startButton:SetCallback("OnClick", function()
         local selected = {}
         local any = false
@@ -308,10 +360,15 @@ local function Build(container)
         state.page = 1
         local count = Scanner:Start({
             classes = selected,
+            races = settings.races,
             minLevel = settings.minLevel,
             maxLevel = settings.maxLevel,
             zone = settings.zone,
         })
+        if count == 0 then
+            GRB:Print(L["None of the selected races can play the selected classes."])
+            return
+        end
         GRB:Printf(L["Scan prepared: %d queries. Press Next query to run them one by one."], count)
     end)
     nextButton:SetCallback("OnClick", function()

@@ -33,6 +33,7 @@ local defaults = {
         },
         scanner = {
             classes = {},     -- [CLASS_TOKEN] = false when unchecked; missing = checked
+            races = {},       -- [RACE_TOKEN] = true when checked; nothing checked = every race
             minLevel = 1,
             maxLevel = 60,
             zone = "",

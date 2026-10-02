@@ -34,6 +34,7 @@ while scanning and restore it afterwards.
 Notes:
 
 - /who has no "guildless" filter, so guildless players are filtered client-side (GetWhoInfo(i).fullGuildName empty).
+- A race selection adds `r-"Race"` to the queries (the filter takes one race per query, so each selected race is its own query). Only the races of the player's own faction can be found, and race/class combinations that do not exist (e.g. Human Shaman) are skipped. Selecting every race of the faction is the same as selecting none.
 - A query that returns a full page (49+ results) is split in half by level and re-queued; if a single level is still full, the scan reports that some players may be missing.
 - With SetWhoToUi(false) results of 3 or fewer players arrive as chat lines instead of WHO_LIST_UPDATE, so the scanner enables SetWhoToUi(true) and stops FriendsFrame from listening to WHO_LIST_UPDATE only while a query is in flight, then restores both (the default is alse; there is no getter).
 

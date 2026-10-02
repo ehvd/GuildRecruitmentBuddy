@@ -248,3 +248,11 @@ L["This session: %d contact change(s) received, %d message(s) sent."] = true
 L["Last change received at %s."] = true
 L["none"] = true
 L["Shares contacts with guild members who can invite, so recruiters never whisper the same player."] = true
+
+-- Scanner race filter
+L["Classes"] = true
+L["Races (none selected = all)"] = true
+L["Level and zone"] = true
+L["Show race"] = true
+L["All races"] = true
+L["None of the selected races can play the selected classes."] = true
