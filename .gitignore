@@ -1,0 +1,9 @@
+# Libraries are fetched by the packager / scripts/fetch-libs.ps1
+GuildRecruitmentBuddy/Libs/
+*.zip
+.release/
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+.env
