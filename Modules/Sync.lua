@@ -70,6 +70,7 @@ local function Pack(contact)
         c = contact.class,
         l = contact.level,
         n = contact.templateName,
+        w = contact.whispered,
         u = GRB.Contacts:UpdatedOf(contact),
     }
 end
@@ -86,6 +87,7 @@ local function Unpack(key, e)
         class = type(e.c) == "string" and strsub(e.c, 1, 24) or nil,
         level = type(e.l) == "number" and e.l >= 1 and e.l <= 80 and e.l or nil,
         templateName = type(e.n) == "string" and strsub(e.n, 1, 60) or nil,
+        whispered = type(e.w) == "number" and e.w or nil,
         updated = e.u,
     }
 end

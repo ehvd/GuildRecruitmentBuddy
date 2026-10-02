@@ -49,8 +49,9 @@ Everyone in your guild who can invite and runs the addon shares the same contact
 - Catches up automatically when you log in, and you can force a full sync with `/grb sync`
 
 ### ✉️ Keyword Auto-Invite
-When a player whispers you **`ginv`** (or any keyword you choose), Guild Recruitment Buddy queues the guild invite for one click.
+When a player you've whispered replies **`ginv`** (or any keyword you choose), Guild Recruitment Buddy queues the guild invite for one click.
 
+- By default only players the addon has whispered are handled, so strangers can't trigger invites (switch it off to also invite players who answer your channel posts)
 - Optional rules: minimum level, allowed classes, ignore players marked do-not-contact
 - Optional automatic reply when the invite goes out
 - Built-in cooldown, so repeated whispers don't trigger repeated invites
@@ -60,7 +61,7 @@ When a player whispers you **`ginv`** (or any keyword you choose), Guild Recruit
 When someone joins the guild, they're marked as joined and can get a welcome whisper with your Discord or website link. Off by default.
 
 ### 🙅 Opt-out Detection
-If a player you contacted replies "no thanks", "not interested" or "stop", they're marked do-not-contact automatically. The phrase list is yours to edit.
+If a player you whispered replies **`stop`** (or `not interested`, `no thanks` and the like), they go on the opt-out list, get one polite confirmation whisper and are never whispered by the addon again. Replies from players the addon hasn't contacted are ignored. The phrase list is yours to edit, and `/grb optout list` / `add` / `remove` manage the list by hand. The opt-out list is account-wide and shared with your fellow recruiters through Officer Sync.
 
 ### 🤫 Quiet Mode
 In combat, dungeons, raids and battlegrounds the addon keeps out of your way: no popups, silent invite requests, welcome whispers held back until you're free. Each context can be switched off, or switch quiet mode on by hand.
@@ -77,6 +78,7 @@ In combat, dungeons, raids and battlegrounds the addon keeps out of your way: no
 | `/grb broadcast on` / `off` | Toggle channel broadcasting |
 | `/grb send` | Send the ready channel broadcast (also a key binding) |
 | `/grb quiet on` / `off` | Switch quiet mode on or off by hand |
+| `/grb optout list` / `add <name>` / `remove <name>` | Manage the opt-out list |
 | `/grb sync` | Force a full contact sync with other recruiters |
 | `/grb config` | Open settings |
 

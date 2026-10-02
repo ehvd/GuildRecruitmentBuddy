@@ -5,6 +5,10 @@ local Contacts = GRB:NewModule("Contacts", "AceEvent-3.0")
 GRB.Contacts = Contacts
 
 local DAY = 86400
+
+-- A player only counts as contacted (for "stop" / "ginv" replies) for this long after the addon whispered them, and
+-- contacts older than this are pruned on load (never "do-not-contact" or "joined", and never within the whisper cooldown).
+Contacts.RETENTION_DAYS = 30
 local ROSTER_REQUEST_INTERVAL = 20
 
 Contacts.STATUSES = { "contacted", "replied", "invited", "joined", "declined", "do-not-contact" }
@@ -71,7 +75,7 @@ function Contacts:Get(name)
     return key and GRB.db.global.contacts[key] or nil, key
 end
 
-local RECORD_FIELDS = { "class", "level", "timestamp", "templateId", "templateName", "status" }
+local RECORD_FIELDS = { "class", "level", "timestamp", "templateId", "templateName", "status", "whispered" }
 
 -- Creates or updates a contact. info may contain class, level, timestamp, templateId, templateName, status.
 function Contacts:Record(name, info)
@@ -128,6 +132,7 @@ function Contacts:ApplyRemote(key, data)
     contact.class = data.class
     contact.level = data.level
     contact.templateName = data.templateName
+    contact.whispered = data.whispered
     contact.updated = data.updated
     return true
 end
@@ -168,6 +173,82 @@ function Contacts:Purge(days)
     return removed
 end
 
+---------------------------------------------------------------------------
+-- Opt-out list and "contacted" gate
+---------------------------------------------------------------------------
+
+-- The opt-out list is the set of contacts with the do-not-contact status: account-wide, keyed "Name-Realm",
+-- shared with the other recruiters by the officer sync. The addon never whispers them.
+function Contacts:IsOptedOut(key)
+    local contact = key and GRB.db.global.contacts[key]
+    return contact ~= nil and contact.status == "do-not-contact"
+end
+
+-- When the addon last whispered the player. Contacts from before the "whispered" field existed fall back to
+-- the template name, which only Whisper:Send records.
+local function WhisperedAt(contact)
+    return contact.whispered or (contact.templateName and contact.timestamp) or nil
+end
+
+-- true when the addon itself whispered this player recently (see RETENTION_DAYS), they have not opted out and
+-- they are not guild members yet. Only such players may trigger "stop" / "ginv" handling: anyone else sending
+-- those words is ignored completely.
+function Contacts:IsKeywordEligible(key)
+    local contact = key and GRB.db.global.contacts[key]
+    if not contact or contact.status == "do-not-contact" or contact.status == "joined" then
+        return false
+    end
+    local whispered = WhisperedAt(contact)
+    return whispered ~= nil and GetServerTime() - whispered <= self.RETENTION_DAYS * DAY
+end
+
+-- Puts a player on the opt-out list (creating the contact when needed). guid is optional.
+function Contacts:OptOut(name, guid)
+    local key = self:Key(name)
+    if not key then return nil end
+    self:SetStatus(key, "do-not-contact")
+    local contact = GRB.db.global.contacts[key]
+    contact.optedOutAt = GetServerTime()
+    if guid and guid ~= "" then contact.guid = guid end
+    return key
+end
+
+-- Takes a player off the opt-out list again. They are neutral afterwards: the whisper cooldown applies and
+-- they have to be whispered again before "stop" / "ginv" are handled for them. Returns false when not listed.
+function Contacts:RemoveOptOut(name)
+    local contact, key = self:Get(name)
+    if not contact or contact.status ~= "do-not-contact" then return false end
+    contact.status = "declined"
+    contact.optedOutAt = nil
+    self:Touch(key)
+    return true
+end
+
+-- Returns an array of { key, contact } for every opted-out player, sorted by name
+function Contacts:GetOptedOut()
+    local list = {}
+    for key, contact in pairs(GRB.db.global.contacts) do
+        if contact.status == "do-not-contact" then
+            tinsert(list, { key = key, contact = contact })
+        end
+    end
+    table.sort(list, function(a, b) return a.key < b.key end)
+    return list
+end
+
+-- Deletes contacts that have not been touched for a long time so the table does not grow forever.
+-- Opted-out players and guild members are kept, and so is anything inside the whisper cooldown.
+function Contacts:PruneStale()
+    local days = max(self.RETENTION_DAYS, GRB.db.profile.cooldownDays)
+    local cutoff = GetServerTime() - days * DAY
+    local contacts = GRB.db.global.contacts
+    for key, contact in pairs(contacts) do
+        if contact.status ~= "do-not-contact" and contact.status ~= "joined"
+            and max(contact.timestamp or 0, contact.updated or 0) < cutoff then
+            contacts[key] = nil
+        end
+    end
+end
 local function SortValue(entry, sortKey)
     local contact = entry.contact
     if sortKey == "name" then
@@ -276,8 +357,12 @@ function Contacts:IsOnline(key)
     return guildOnline[key]
 end
 
-function Contacts:OnWhisper(_, _, sender)
+function Contacts:OnWhisper(_, _, sender, ...)
     local contact, key = self:Get(sender)
+    local guid = select(10, ...)
+    if contact and guid and guid ~= "" then
+        contact.guid = guid
+    end
     if contact and contact.status == "contacted" then
         contact.status = "replied"
         self:Touch(key)
@@ -285,6 +370,7 @@ function Contacts:OnWhisper(_, _, sender)
 end
 
 function Contacts:OnEnable()
+    self:PruneStale()
     self:RegisterEvent("GUILD_ROSTER_UPDATE", "RebuildGuildCache")
     self:RegisterEvent("PLAYER_GUILD_UPDATE", "RequestRoster")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "RequestRoster")

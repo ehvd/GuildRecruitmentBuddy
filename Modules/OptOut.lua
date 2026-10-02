@@ -4,10 +4,14 @@ local L = GRB.L
 local OptOut = GRB:NewModule("OptOut", "AceEvent-3.0")
 GRB.OptOut = OptOut
 
--- A single word such as "no" only counts at the start of a short reply: "no thanks" opts out,
--- "no problem, I'll join" does not.
-local SHORT_REPLY_WORDS = 3
-
+-- A reply opts a player out only when
+--   * the addon itself whispered that player recently (Contacts:IsKeywordEligible); anyone else is ignored
+--     completely, so a stranger typing "stop" changes nothing and gets no reply, and
+--   * the whole reply, trimmed and without punctuation, is one of the phrases (a single word such as "stop"
+--     must be the entire reply: "stop" and "STOP!" match, "stop by later" and "don't stop" do not), or it
+--     contains one of the multi-word phrases ("please stop spamming me").
+-- The player goes on the opt-out list (do-not-contact), gets one confirmation whisper and, being no longer
+-- contacted, gets no answer to a repeated "stop".
 local parsedCache = {}   -- raw setting string -> { normalized phrases }
 
 local function Settings()
@@ -60,30 +64,66 @@ function OptOut:Match(text)
         if StartsWith(message, exception) then return nil end
     end
 
-    local words = WordCount(message)
     for _, phrase in ipairs(ParsePhrases(settings.phrases)) do
         if WordCount(phrase) > 1 then
             if Contains(message, phrase) then return phrase end
-        elseif StartsWith(message, phrase) and words <= SHORT_REPLY_WORDS then
+        elseif message == phrase then
             return phrase
         end
     end
     return nil
 end
 
-function OptOut:OnWhisper(_, text, sender)
+function OptOut:OnWhisper(_, text, sender, ...)
     if not Settings().enabled then return end
 
-    local contact, key = GRB.Contacts:Get(sender)
-    -- Only players we contacted and who have not been invited or joined yet
-    if not contact or (contact.status ~= "contacted" and contact.status ~= "replied") then return end
+    local contacts = GRB.Contacts
+    local key = contacts:Key(sender)
+    -- Only players this addon whispered recently are handled; everyone else is ignored completely
+    if not key or not contacts:IsKeywordEligible(key) then return end
 
     local phrase = self:Match(text)
     if not phrase then return end
 
-    GRB.Contacts:SetStatus(key, "do-not-contact")
+    contacts:OptOut(key, (select(10, ...)))
     if Settings().notify then
-        GRB:Printf(L["%s replied \"%s\": marked do-not-contact."], contact.name or key, text)
+        GRB:Printf(L["%s replied \"%s\": marked do-not-contact."], (contacts:SplitKey(key)), text)
+    end
+    if Settings().ack then
+        GRB.Whisper:SendText(key, L["Got it, you won't hear from me again. Good luck out there!"], { ack = true })
+    end
+end
+
+-- /grb optout list | add <name> | remove <name>
+function OptOut:HandleCommand(sub, name)
+    local contacts = GRB.Contacts
+    if sub == "list" then
+        local list = contacts:GetOptedOut()
+        GRB:Printf(L["Opted-out players: %d"], #list)
+        local names = {}
+        for _, entry in ipairs(list) do
+            tinsert(names, (contacts:SplitKey(entry.key)))
+            if #names == 10 then
+                GRB:Print(table.concat(names, ", "))
+                wipe(names)
+            end
+        end
+        if #names > 0 then GRB:Print(table.concat(names, ", ")) end
+    elseif (sub == "add" or sub == "remove") and name and name ~= "" then
+        local key = contacts:Key(name)
+        if not key then return end
+        if sub == "add" then
+            contacts:OptOut(key)
+            GRB:Printf(L["%s is now on the opt-out list."], key)
+        elseif contacts:RemoveOptOut(key) then
+            GRB:Printf(L["%s was taken off the opt-out list."], key)
+        else
+            GRB:Printf(L["%s is not on the opt-out list."], key)
+        end
+    else
+        GRB:Print(L["/grb optout list - show the players who opted out"])
+        GRB:Print(L["/grb optout add <name> - put a player on the opt-out list"])
+        GRB:Print(L["/grb optout remove <name> - take a player off the opt-out list"])
     end
 end
 

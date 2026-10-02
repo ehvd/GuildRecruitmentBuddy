@@ -92,6 +92,10 @@ function AutoInvite:OnWhisper(_, text, sender, ...)
     local key = GRB.Contacts:Key(sender)
     if not key then return end
 
+    -- Only players this addon whispered are handled: anyone else gets no invite and no reply and changes nothing.
+    -- (Players who answer a channel post were never whispered; switch the setting off to invite them too.)
+    if Settings().onlyContacted and not GRB.Contacts:IsKeywordEligible(key) then return end
+
     -- Per-player cooldown so repeated "ginv" does not spam requests
     local now = GetTime()
     local last = lastRequest[key]
@@ -140,7 +144,7 @@ function AutoInvite:SendReply(entry)
     if not settings.replyEnabled then return end
 
     local ok, reason = GRB.Whisper:SendFreeText(entry.key, settings.replyText, { class = entry.class, level = entry.level })
-    if not ok then
+    if not ok and reason then
         GRB:Print(format(L["Auto-reply skipped: %s"], reason))
     end
 end
@@ -174,7 +178,8 @@ end
 -- Must be called from a click (hardware event). Invites the first queued player.
 function AutoInvite:AcceptNext()
     local entry = tremove(queue, 1)
-    if entry then
+    -- A request that was queued before the player opted out is dropped
+    if entry and not GRB.Contacts:IsOptedOut(entry.key) then
         self:InviteNow(entry, true)
     end
     self:Notify()
