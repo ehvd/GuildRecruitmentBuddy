@@ -10,7 +10,7 @@ local queue = {}          -- pending requests: { key, target, class, token, leve
 local lastRequest = {}    -- "Name-Realm" -> GetTime() of the last request, for the per-player cooldown
 local warnedNoPermission = false
 
-AutoInvite.CLASSES = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID" }
+AutoInvite.CLASSES = GRB.CLASSES
 
 local function Settings()
     return GRB.db.profile.autoInvite
@@ -148,25 +148,37 @@ function AutoInvite:SendReply(entry)
     end
 end
 
+-- Must be called from a click (hardware event).
+-- entry: { key, target, class, level }. Returns true when the invite was sent.
+function AutoInvite:InviteNow(entry, withReply)
+    if not CanGuildInvite() then
+        GRB:Print(L["You do not have permission to invite players to the guild."])
+        return false
+    end
+    if GRB.Contacts:IsInGuild(entry.key) then
+        GRB:Printf(L["%s is already in our guild."], entry.target)
+        return false
+    end
+
+    Invite(entry.target)
+    GRB.Contacts:Record(entry.key, {
+        class = entry.class,
+        level = entry.level,
+        timestamp = GetServerTime(),
+        status = "invited",
+    })
+    GRB:Printf(L["Invited %s to the guild."], entry.target)
+    if withReply then
+        self:SendReply(entry)
+    end
+    return true
+end
+
 -- Must be called from a click (hardware event). Invites the first queued player.
 function AutoInvite:AcceptNext()
     local entry = tremove(queue, 1)
-    if not entry then return end
-
-    if not CanGuildInvite() then
-        GRB:Print(L["You do not have permission to invite players to the guild."])
-    elseif GRB.Contacts:IsInGuild(entry.key) then
-        GRB:Printf(L["%s is already in our guild."], entry.target)
-    else
-        Invite(entry.target)
-        GRB.Contacts:Record(entry.key, {
-            class = entry.class,
-            level = entry.level,
-            timestamp = GetServerTime(),
-            status = "invited",
-        })
-        GRB:Printf(L["Invited %s to the guild."], entry.target)
-        self:SendReply(entry)
+    if entry then
+        self:InviteNow(entry, true)
     end
     self:Notify()
 end
