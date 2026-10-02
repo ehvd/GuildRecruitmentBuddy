@@ -301,3 +301,7 @@ L["Recruit"] = true
 L["No whisper templates yet."] = true
 L["Add a Recruit entry to the right-click menu of players"] = true
 L["Right-click a name (chat, target, party, friends) to whisper a template to that player."] = true
+L["%s is already in a guild; not whispering."] = true
+L["Could not find %s (offline?); not whispering."] = true
+L["%s is in the guild <%s>; not whispering."] = true
+L["Checking whether %s is in a guild..."] = true
