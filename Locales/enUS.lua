@@ -257,6 +257,7 @@ L["in a raid"] = true
 L["in a battleground"] = true
 L["Keeps recruiting out of the way: no broadcast popups, silent invite requests, held-back welcomes."] = true
 L["Enable automatic quiet mode"] = true
+L["In combat"] = true
 L["In dungeons"] = true
 L["In raids"] = true
 L["In battlegrounds and arenas"] = true
