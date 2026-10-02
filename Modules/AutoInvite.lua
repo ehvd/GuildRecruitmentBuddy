@@ -132,17 +132,7 @@ function AutoInvite:SendReply(entry)
     local settings = Settings()
     if not settings.replyEnabled then return end
 
-    local ctx = GRB.Messages:GetBaseContext()
-    ctx.name = (GRB.Contacts:SplitKey(entry.key))
-    ctx.class = entry.class or L["adventurer"]
-    ctx.level = entry.level
-    local result = GRB.Messages:Validate(settings.replyText, ctx)
-    if not result.ok or #result.unresolved > 0 or #result.unknown > 0 then
-        GRB:Print(L["Auto-reply skipped: the reply text is empty, too long or has unset placeholders."])
-        return
-    end
-
-    local ok, reason = GRB.Whisper:SendText(entry.key, result.rendered)
+    local ok, reason = GRB.Whisper:SendFreeText(entry.key, settings.replyText, { class = entry.class, level = entry.level })
     if not ok then
         GRB:Print(format(L["Auto-reply skipped: %s"], reason))
     end
