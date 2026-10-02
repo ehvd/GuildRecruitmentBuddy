@@ -13,7 +13,29 @@ local MIN_INTERVAL = 5       -- seconds between queries (server throttle)
 local RESPONSE_TIMEOUT = 8   -- seconds to wait for WHO_LIST_UPDATE
 local MAX_RETRIES = 2
 
-local queue = {}      -- pending queries: { token, class, lo, hi, zone, retries }
+-- Classic Era races per faction (client race tokens), with the race ids for C_CreatureInfo and which classes
+-- each race can play, so a race selection does not queue impossible combinations such as Human Shaman.
+Scanner.FACTION_RACES = {
+    Alliance = { "Human", "Dwarf", "NightElf", "Gnome" },
+    Horde = { "Orc", "Scourge", "Tauren", "Troll" },
+}
+local RACE_IDS = { Human = 1, Orc = 2, Dwarf = 3, NightElf = 4, Scourge = 5, Tauren = 6, Gnome = 7, Troll = 8 }
+local RACE_NAMES = {   -- fallback when the client cannot tell the localized name
+    Human = "Human", Orc = "Orc", Dwarf = "Dwarf", NightElf = "Night Elf",
+    Scourge = "Undead", Tauren = "Tauren", Gnome = "Gnome", Troll = "Troll",
+}
+local RACE_CLASSES = {
+    Human = { WARRIOR = true, PALADIN = true, ROGUE = true, PRIEST = true, MAGE = true, WARLOCK = true },
+    Dwarf = { WARRIOR = true, PALADIN = true, HUNTER = true, ROGUE = true, PRIEST = true },
+    NightElf = { WARRIOR = true, HUNTER = true, ROGUE = true, PRIEST = true, DRUID = true },
+    Gnome = { WARRIOR = true, ROGUE = true, MAGE = true, WARLOCK = true },
+    Orc = { WARRIOR = true, HUNTER = true, ROGUE = true, SHAMAN = true, WARLOCK = true },
+    Scourge = { WARRIOR = true, ROGUE = true, PRIEST = true, MAGE = true, WARLOCK = true },
+    Tauren = { WARRIOR = true, HUNTER = true, SHAMAN = true, DRUID = true },
+    Troll = { WARRIOR = true, HUNTER = true, ROGUE = true, PRIEST = true, SHAMAN = true, MAGE = true },
+}
+
+local queue = {}      -- pending queries: { token, class, raceToken, race, lo, hi, zone, retries }
 local results = {}    -- guildless players found: { key, name, class, token, level, zone }
 local seen = {}       -- "Name-Realm" -> true
 local stats = {}
@@ -63,8 +85,23 @@ end
 -- Queue
 ---------------------------------------------------------------------------
 
+-- Race tokens of the player's own faction (the only ones /who can find)
+function Scanner:GetRaces()
+    return Scanner.FACTION_RACES[UnitFactionGroup("player")] or {}
+end
+
+-- Localized race name, as used by /who r-"..." and returned by GetWhoInfo
+function Scanner:GetRaceName(token)
+    local id = RACE_IDS[token]
+    local info = id and C_CreatureInfo and C_CreatureInfo.GetRaceInfo and C_CreatureInfo.GetRaceInfo(id)
+    return (info and info.raceName) or RACE_NAMES[token] or token
+end
+
 local function BuildFilter(query)
     local filter = format("c-\"%s\"", query.class)
+    if query.race then
+        filter = filter .. format(" r-\"%s\"", query.race)
+    end
     if query.lo == query.hi then
         filter = filter .. " " .. query.lo
     else
@@ -78,7 +115,7 @@ end
 
 function Scanner:DescribeQuery(query)
     local range = query.lo == query.hi and tostring(query.lo) or (query.lo .. "-" .. query.hi)
-    return format("%s %s", query.class, range)
+    return format("%s%s %s", query.race and (query.race .. " ") or "", query.class, range)
 end
 
 function Scanner:Notify()
@@ -99,29 +136,50 @@ function Scanner:Reset()
     self:Notify()
 end
 
--- opts: { classes = { [TOKEN] = true }, minLevel, maxLevel, zone }. Replaces the queue and results.
+-- opts: { classes = { [TOKEN] = true }, races = { [RACE_TOKEN] = true } (empty = every race), minLevel, maxLevel, zone }.
+-- Replaces the queue and results. With a race selection each query asks for one race (r-"Race"), so a busy
+-- class does not hide the wanted race behind the 49-result cap; combinations the race cannot play are skipped.
+-- Returns the number of queries.
 function Scanner:Start(opts)
     self:Reset()
     local zone = strtrim((gsub(opts.zone or "", "\"", "")))
+
+    local factionRaces = self:GetRaces()
+    local races = {}
+    for _, raceToken in ipairs(factionRaces) do
+        if opts.races and opts.races[raceToken] then
+            tinsert(races, raceToken)
+        end
+    end
+    -- Nothing selected, or every race selected: no race filter at all
+    if #races == 0 or #races == #factionRaces then
+        races = { false }
+    end
+
     for _, token in ipairs(GRB.CLASSES) do
         if opts.classes[token] then
             local className = (LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[token]) or token
-            for lo = opts.minLevel, opts.maxLevel, SLICE do
-                tinsert(queue, {
-                    token = token,
-                    class = className,
-                    lo = lo,
-                    hi = min(lo + SLICE - 1, opts.maxLevel),
-                    zone = zone,
-                    retries = 0,
-                })
+            for _, raceToken in ipairs(races) do
+                if not raceToken or RACE_CLASSES[raceToken][token] then
+                    for lo = opts.minLevel, opts.maxLevel, SLICE do
+                        tinsert(queue, {
+                            token = token,
+                            class = className,
+                            raceToken = raceToken or nil,
+                            race = raceToken and self:GetRaceName(raceToken) or nil,
+                            lo = lo,
+                            hi = min(lo + SLICE - 1, opts.maxLevel),
+                            zone = zone,
+                            retries = 0,
+                        })
+                    end
+                end
             end
         end
     end
     self:Notify()
     return #queue
 end
-
 function Scanner:GetQueueSize()
     return #queue
 end
@@ -185,10 +243,19 @@ local function AddResult(info)
         key = key,
         name = (GRB.Contacts:SplitKey(key)),
         class = info.classStr,
+        race = info.raceStr,
         token = info.filename,
         level = info.level,
         zone = info.area,
     })
+end
+
+-- A copy of a query for part of its level range (same class, race and zone)
+local function Half(query, lo, hi)
+    return {
+        token = query.token, class = query.class, raceToken = query.raceToken, race = query.race,
+        lo = lo, hi = hi, zone = query.zone, retries = 0,
+    }
 end
 
 function Scanner:OnWhoListUpdate()
@@ -216,8 +283,8 @@ function Scanner:OnWhoListUpdate()
     if count >= MAX_RESULTS then
         if query.lo < query.hi then
             local mid = floor((query.lo + query.hi) / 2)
-            tinsert(queue, 1, { token = query.token, class = query.class, lo = mid + 1, hi = query.hi, zone = query.zone, retries = 0 })
-            tinsert(queue, 1, { token = query.token, class = query.class, lo = query.lo, hi = mid, zone = query.zone, retries = 0 })
+            tinsert(queue, 1, Half(query, mid + 1, query.hi))
+            tinsert(queue, 1, Half(query, query.lo, mid))
         else
             stats.capped = stats.capped + 1
         end

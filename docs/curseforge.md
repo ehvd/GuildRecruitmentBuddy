@@ -11,7 +11,7 @@ Built for **WoW Classic Era** by an officer of an active raiding guild, for the 
 ## Features
 
 ### 🔍 Guildless Player Scanner
-Find players who aren't in a guild, filtered by **class**, **level range** and **zone**.
+Find players who aren't in a guild, filtered by **class**, **race**, **level range** and **zone**.
 
 - Splits your search into small `/who` queries, and splits busy ones again, so results aren't cut off at the 50-player limit
 - Shows only players without a guild
@@ -110,7 +110,6 @@ Planned for future versions:
 - **Recruitment needs**: set which classes and roles you're looking for, and the scanner filters for them
 - **Recruitment statistics**: see which of your messages actually get replies
 - **Guild capacity warning** when you're close to the member cap
-- **Race filter** for the scanner
 - **Finnish localization**
 
 ---

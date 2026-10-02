@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- Scanner race filter: pick races of your own faction (none selected = all races); each selected race becomes its own `/who` query and combinations that cannot exist are skipped, with the usual splitting when a query returns a full page. The results show each player's race and can be filtered by it.
+
 ### Changed
 - The reminder issue to update the CurseForge description now contains the Markdown in a code block with a copy button, and older open reminder issues are closed automatically when a newer one is opened.
 
