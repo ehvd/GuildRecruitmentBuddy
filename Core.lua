@@ -55,6 +55,11 @@ local defaults = {
             onlyRecruited = false,  -- only players that are in the contact database
             text = L["Welcome to {guild}, {name}! Our Discord: {discord}"],
         },
+        leads = {                   -- see Modules/Leads.lua
+            enabled = true,         -- keep replies like "maybe later" as leads
+            phrases = "maybe, later, interested, thinking about it, tell me more, not yet, sounds good, sounds interesting, " ..
+                "what time, what do you raid, how many",
+        },
         optOut = {
             enabled = true,         -- reply such as "not interested" marks a contacted player do-not-contact
             notify = true,          -- print a chat notice when that happens
@@ -130,6 +135,8 @@ function GRB:PrintUsage()
     self:Print(L["/grb send - send the ready channel broadcast"])
     self:Print(L["/grb quiet on|off - switch quiet mode on or off by hand"])
     self:Print(L["/grb sync - force a full contact sync with the other recruiters"])
+    self:Print(L["/grb leads - open the leads"])
+    self:Print(L["/grb lead <name> [message] - save a player as a lead"])
     self:Print(L["/grb optout list - show the players who opted out"])
     self:Print(L["/grb optout add <name> - put a player on the opt-out list"])
     self:Print(L["/grb optout remove <name> - take a player off the opt-out list"])
@@ -148,6 +155,15 @@ function GRB:HandleSlashCommand(input)
         self:SetInviteEnabled(arg == "on")
     elseif cmd == "broadcast" and (arg == "on" or arg == "off") then
         self.Broadcast:SetActive(arg == "on")
+    elseif cmd == "leads" then
+        self.MainFrame:Open("Leads")
+    elseif cmd == "lead" then
+        local name, text = (input or ""):match("^%s*%S+%s+(%S+)%s*(.*)$")
+        if name then
+            self:Printf(L["%s is now a lead."], self.Contacts:SetLead(name, text))
+        else
+            self:Print(L["/grb lead <name> [message] - save a player as a lead"])
+        end
     elseif cmd == "optout" then
         self.OptOut:HandleCommand(arg, rest)
     elseif cmd == "sync" then

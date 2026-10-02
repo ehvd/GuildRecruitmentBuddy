@@ -17,6 +17,8 @@ a memory of who was already contacted, "ginv" auto-invite and a guildless-player
 | `/grb scan` | Open the scanner tab |
 | `/grb broadcast on\|off` | Toggle interval broadcasting of channel messages |
 | `/grb send` | Send the ready channel broadcast (also a key binding) |
+| `/grb leads` | Open the leads (interested players whose replies are kept) |
+| `/grb lead <name> [message]` | Save a player as a lead, optionally with their message |
 | `/grb optout list` / `add <name>` / `remove <name>` | Show, extend or trim the list of players who opted out of recruitment whispers |
 | `/grb sync` | Force a full contact sync with the other recruiters (officer sync) |
 | `/grb quiet on\|off` | Switch quiet mode (pauses recruiting popups and automation) on or off by hand |

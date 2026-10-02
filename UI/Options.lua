@@ -7,6 +7,7 @@ local function GetOptions()
     local invite = db.autoInvite
     local broadcast = db.broadcast
     local optOut = db.optOut
+    local leads = db.leads
     local welcome = db.welcome
     local quiet = db.quiet
     return {
@@ -391,6 +392,35 @@ local function GetOptions()
                         order = 3,
                         disabled = function() return not GRB.Sync:CanSync() end,
                         func = function() GRB.Sync:ForceSync() end,
+                    },
+                },
+            },            leads = {
+                type = "group",
+                name = L["Leads"],
+                order = 8,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["Replies from players you contacted that sound interested but not ready are kept as leads."],
+                    },
+                    enabled = {
+                        type = "toggle",
+                        name = L["Save interested replies as leads"],
+                        order = 1,
+                        width = "full",
+                        get = function() return leads.enabled end,
+                        set = function(_, value) leads.enabled = value end,
+                    },
+                    phrases = {
+                        type = "input",
+                        name = L["Lead phrases (comma separated)"],
+                        desc = L["A reply containing one of these words or phrases becomes a lead (opt-outs never do)."],
+                        order = 2,
+                        width = "full",
+                        multiline = 3,
+                        get = function() return leads.phrases end,
+                        set = function(_, value) leads.phrases = value or "" end,
                     },
                 },
             },            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),

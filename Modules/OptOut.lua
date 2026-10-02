@@ -59,6 +59,9 @@ local function Contains(message, phrase)
     return (" " .. message .. " "):find(" " .. phrase .. " ", 1, true) ~= nil
 end
 
+-- Shared with the leads detection (Modules/Leads.lua)
+OptOut.Normalize, OptOut.ParsePhrases, OptOut.Contains = Normalize, ParsePhrases, Contains
+
 -- Returns the phrase that matched, or nil when the text is not an opt-out.
 function OptOut:Match(text)
     local message = Normalize(text or "")

@@ -9,12 +9,14 @@ local DAY = 86400
 -- A player only counts as contacted (for "stop" / "ginv" replies) for this long after the addon whispered them, and
 -- contacts older than this are pruned on load (never "do-not-contact" or "joined", and never within the whisper cooldown).
 Contacts.RETENTION_DAYS = 30
+Contacts.MAX_REPLIES = 5   -- replies kept per contact
 local ROSTER_REQUEST_INTERVAL = 20
 
-Contacts.STATUSES = { "contacted", "replied", "invited", "joined", "declined", "do-not-contact" }
+Contacts.STATUSES = { "contacted", "replied", "lead", "invited", "joined", "declined", "do-not-contact" }
 Contacts.STATUS_LABELS = {
     ["contacted"] = L["Contacted"],
     ["replied"] = L["Replied"],
+    ["lead"] = L["Lead"],
     ["invited"] = L["Invited"],
     ["joined"] = L["Joined"],
     ["declined"] = L["Declined"],
@@ -158,14 +160,14 @@ function Contacts:Delete(name)
     return false
 end
 
--- Removes contacts last contacted more than `days` days ago. "Do not contact" entries are kept
+-- Removes contacts last contacted more than `days` days ago. Leads and "Do not contact" entries are kept
 -- so a purge never makes it possible to whisper someone who asked not to be contacted.
 function Contacts:Purge(days)
     local cutoff = GetServerTime() - days * DAY
     local contacts = GRB.db.global.contacts
     local removed = 0
     for key, contact in pairs(contacts) do
-        if contact.status ~= "do-not-contact" and (contact.timestamp or 0) < cutoff then
+        if contact.status ~= "do-not-contact" and contact.status ~= "lead" and (contact.timestamp or 0) < cutoff then
             contacts[key] = nil
             removed = removed + 1
         end
@@ -199,6 +201,7 @@ function Contacts:IsKeywordEligible(key)
         return false
     end
     local whispered = WhisperedAt(contact)
+    if contact.status == "lead" then return whispered ~= nil end
     return whispered ~= nil and GetServerTime() - whispered <= self.RETENTION_DAYS * DAY
 end
 
@@ -236,14 +239,77 @@ function Contacts:GetOptedOut()
     return list
 end
 
+---------------------------------------------------------------------------
+-- Replies and leads
+---------------------------------------------------------------------------
+
+-- Remembers what a contact whispered back (the last MAX_REPLIES replies; replies are not shared by the officer sync)
+function Contacts:AddReply(contact, text)
+    if not text or text == "" then return end
+    contact.replies = contact.replies or {}
+    local replies = contact.replies
+    text = strsub(text, 1, 255)
+    local last = replies[#replies]
+    if last and last.text == text then return end
+    tinsert(replies, { t = GetServerTime(), text = text })
+    while #replies > self.MAX_REPLIES do
+        tremove(replies, 1)
+    end
+end
+
+-- The newest saved reply of a contact, or nil
+function Contacts:GetLastReply(contact)
+    local replies = contact.replies
+    return replies and replies[#replies] or nil
+end
+
+-- Marks a player as a lead (creating the contact when needed) and optionally saves the message that made them one.
+-- Leads are never pruned or purged. Returns the key.
+function Contacts:SetLead(name, text)
+    local key = self:Key(name)
+    if not key then return nil end
+    self:SetStatus(key, "lead")
+    local contact = GRB.db.global.contacts[key]
+    if text and text ~= "" then self:AddReply(contact, text) end
+    return key
+end
+
+-- Takes a player out of the leads again; they are a normal replied contact afterwards
+function Contacts:RemoveLead(name)
+    local contact, key = self:Get(name)
+    if not contact or contact.status ~= "lead" then return false end
+    contact.status = "replied"
+    self:Touch(key)
+    return true
+end
+
+-- Returns an array of { key, contact } for every lead, the most recently active first
+function Contacts:GetLeads()
+    local list = {}
+    for key, contact in pairs(GRB.db.global.contacts) do
+        if contact.status == "lead" then
+            tinsert(list, { key = key, contact = contact })
+        end
+    end
+    local function Newest(entry)
+        local reply = self:GetLastReply(entry.contact)
+        return reply and reply.t or self:UpdatedOf(entry.contact)
+    end
+    table.sort(list, function(a, b)
+        local na, nb = Newest(a), Newest(b)
+        if na ~= nb then return na > nb end
+        return a.key < b.key
+    end)
+    return list
+end
 -- Deletes contacts that have not been touched for a long time so the table does not grow forever.
--- Opted-out players and guild members are kept, and so is anything inside the whisper cooldown.
+-- Opted-out players, leads and guild members are kept, and so is anything inside the whisper cooldown.
 function Contacts:PruneStale()
     local days = max(self.RETENTION_DAYS, GRB.db.profile.cooldownDays)
     local cutoff = GetServerTime() - days * DAY
     local contacts = GRB.db.global.contacts
     for key, contact in pairs(contacts) do
-        if contact.status ~= "do-not-contact" and contact.status ~= "joined"
+        if contact.status ~= "do-not-contact" and contact.status ~= "joined" and contact.status ~= "lead"
             and max(contact.timestamp or 0, contact.updated or 0) < cutoff then
             contacts[key] = nil
         end
@@ -360,11 +426,15 @@ function Contacts:IsOnline(key)
     return guildOnline[key]
 end
 
-function Contacts:OnWhisper(_, _, sender, ...)
+function Contacts:OnWhisper(_, text, sender, ...)
     local contact, key = self:Get(sender)
     local guid = select(10, ...)
     if contact and guid and guid ~= "" then
         contact.guid = guid
+    end
+    -- Keep what contacts write back so a promising reply is not lost in the chat log
+    if contact and contact.status ~= "do-not-contact" then
+        self:AddReply(contact, text)
     end
     if contact and contact.status == "contacted" then
         contact.status = "replied"
