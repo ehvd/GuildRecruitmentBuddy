@@ -25,7 +25,13 @@ results arrive via `WHO_LIST_UPDATE` and are capped at 50 per query.
 "Next query" runs exactly one. Use `C_FriendList.SetWhoToUi` to keep the default `/who` UI quiet
 while scanning and restore it afterwards.
 
-Source: <https://warcraft.wiki.gg/wiki/API_C_FriendList.SendWho>
+Notes:
+
+- /who has no "guildless" filter, so guildless players are filtered client-side (GetWhoInfo(i).fullGuildName empty).
+- A query that returns a full page (49+ results) is split in half by level and re-queued; if a single level is still full, the scan reports that some players may be missing.
+- With SetWhoToUi(false) results of 3 or fewer players arrive as chat lines instead of WHO_LIST_UPDATE, so the scanner enables SetWhoToUi(true) and stops FriendsFrame from listening to WHO_LIST_UPDATE only while a query is in flight, then restores both (the default is alse; there is no getter).
+
+Sources: <https://warcraft.wiki.gg/wiki/API_C_FriendList.SendWho>, <https://warcraft.wiki.gg/wiki/API_C_FriendList.GetWhoInfo>, <https://warcraft.wiki.gg/wiki/API_C_FriendList.SetWhoToUi>
 
 ## 3. Guild invites need a hardware event
 

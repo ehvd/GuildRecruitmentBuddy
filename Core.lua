@@ -6,6 +6,9 @@ GuildRecruitmentBuddy = GRB
 local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 GRB.L = L
 
+-- Classic Era class tokens
+GRB.CLASSES = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID" }
+
 local getMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 GRB.version = getMetadata(ADDON_NAME, "Version") or "dev"
 
@@ -21,6 +24,12 @@ local defaults = {
             cooldownMinutes = 10,       -- ignore repeated keywords from the same player for this long
             replyEnabled = false,
             replyText = L["Invited you to {guild}! Accept the invite to join."],
+        },
+        scanner = {
+            classes = {},     -- [CLASS_TOKEN] = false when unchecked; missing = checked
+            minLevel = 1,
+            maxLevel = 60,
+            zone = "",
         },
         guildName = "",   -- overrides the detected guild name for {guild}
         discord = "",     -- value of {discord}
