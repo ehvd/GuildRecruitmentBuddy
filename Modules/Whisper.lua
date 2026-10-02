@@ -44,6 +44,17 @@ local function BuildContext(name, info)
     return ctx
 end
 
+-- Renders free text (placeholders {name} {class} {level} {guild} {discord}) for a player and whispers it.
+-- Refuses text that is empty, too long or has unset placeholders. Does not touch the contact database.
+-- info is optional: { class = "Warrior", level = 60 }. Returns true, or false and a reason.
+function Whisper:SendFreeText(name, text, info)
+    local result = GRB.Messages:Validate(text, BuildContext(name, info))
+    if not result.ok or #result.unresolved > 0 or #result.unknown > 0 then
+        return false, L["The text is empty, too long or has unset placeholders."]
+    end
+    return self:SendText(name, result.rendered)
+end
+
 -- Returns true, or false and the reason why the template cannot be whispered to the player right now.
 function Whisper:CanSend(name, templateId, info)
     local ok, reason = GRB.Contacts:CanContact(name)

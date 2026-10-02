@@ -7,6 +7,7 @@ local function GetOptions()
     local invite = db.autoInvite
     local broadcast = db.broadcast
     local optOut = db.optOut
+    local welcome = db.welcome
     return {
         type = "group",
         name = L["ADDON_NAME"],
@@ -246,6 +247,44 @@ local function GetOptions()
                         width = "full",
                         get = function() return optOut.exceptions end,
                         set = function(_, value) optOut.exceptions = value or "" end,
+                    },
+                },
+            },            welcome = {
+                type = "group",
+                name = L["Welcome flow"],
+                order = 5,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["When someone joins the guild they are marked as joined and can get a welcome whisper."],
+                    },
+                    enabled = {
+                        type = "toggle",
+                        name = L["Whisper new guild members"],
+                        order = 1,
+                        width = "full",
+                        get = function() return welcome.enabled end,
+                        set = function(_, value) welcome.enabled = value end,
+                    },
+                    onlyRecruited = {
+                        type = "toggle",
+                        name = L["Only players I contacted or invited"],
+                        desc = L["Only welcome players that are in the contact database."],
+                        order = 2,
+                        width = "full",
+                        get = function() return welcome.onlyRecruited end,
+                        set = function(_, value) welcome.onlyRecruited = value end,
+                    },
+                    text = {
+                        type = "input",
+                        name = L["Welcome message"],
+                        desc = L["Placeholders: {name} {class} {level} {guild} {discord}"],
+                        order = 3,
+                        width = "full",
+                        multiline = 3,
+                        get = function() return welcome.text end,
+                        set = function(_, value) welcome.text = value or "" end,
                     },
                 },
             },            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),

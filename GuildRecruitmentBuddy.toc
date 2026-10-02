@@ -20,6 +20,7 @@ Modules\Whisper.lua
 Modules\AutoInvite.lua
 Modules\Scanner.lua
 Modules\OptOut.lua
+Modules\Welcome.lua
 Modules\Broadcast.lua
 
 UI\InviteFrame.lua

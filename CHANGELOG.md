@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- Welcome flow: when someone joins the guild (detected from the client's own join message, so it works in every language) their contact is marked as joined and, if enabled, they get a welcome whisper (default: "Welcome to {guild}, {name}! Our Discord: {discord}") a few seconds later. Off by default; optionally only for players you contacted or invited; do-not-contact players are never welcomed or re-labelled.
+
 ## [0.2.0] - 2026-10-02
 
 ### Added

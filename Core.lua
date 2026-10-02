@@ -37,6 +37,11 @@ local defaults = {
             maxLevel = 60,
             zone = "",
         },
+        welcome = {
+            enabled = false,        -- whisper new guild members (off by default)
+            onlyRecruited = false,  -- only players that are in the contact database
+            text = L["Welcome to {guild}, {name}! Our Discord: {discord}"],
+        },
         optOut = {
             enabled = true,         -- reply such as "not interested" marks a contacted player do-not-contact
             notify = true,          -- print a chat notice when that happens

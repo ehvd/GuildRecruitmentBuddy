@@ -102,7 +102,6 @@ L["%d more waiting"] = true
 L["Invited %s to the guild."] = true
 L["You do not have permission to invite players to the guild."] = true
 L["Invited you to {guild}! Accept the invite to join."] = true
-L["Auto-reply skipped: the reply text is empty, too long or has unset placeholders."] = true
 L["Auto-reply skipped: %s"] = true
 L["A keyword whisper queues an invite request. Click Invite in the popup to send it."] = true
 L["Enable auto invite"] = true
@@ -208,3 +207,15 @@ L["Disable this broadcast"] = true
 L["Disable broadcasting"] = true
 L["Broadcast disabled. You can enable it again in the Broadcast tab."] = true
 L["Broadcast settings"] = true
+
+-- Welcome flow
+L["Welcome flow"] = true
+L["Welcome to {guild}, {name}! Our Discord: {discord}"] = true
+L["When someone joins the guild they are marked as joined and can get a welcome whisper."] = true
+L["Whisper new guild members"] = true
+L["Only players I contacted or invited"] = true
+L["Only welcome players that are in the contact database."] = true
+L["Welcome message"] = true
+L["Welcomed %s."] = true
+L["Welcome message to %s skipped: %s"] = true
+L["The text is empty, too long or has unset placeholders."] = true
