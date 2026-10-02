@@ -1,0 +1,181 @@
+local GRB = GuildRecruitmentBuddy
+local L = GRB.L
+
+local AutoInvite = GRB:NewModule("AutoInvite", "AceEvent-3.0")
+GRB.AutoInvite = AutoInvite
+
+-- C_GuildInfo.Invite needs a hardware event, so a whisper only queues a request.
+-- The invite itself happens when the user clicks the button of the invite popup (UI/InviteFrame.lua).
+local queue = {}          -- pending requests: { key, target, class, token, level }
+local lastRequest = {}    -- "Name-Realm" -> GetTime() of the last request, for the per-player cooldown
+local warnedNoPermission = false
+
+AutoInvite.CLASSES = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID" }
+
+local function Settings()
+    return GRB.db.profile.autoInvite
+end
+
+local function EscapePattern(text)
+    return (gsub(text, "%p", "%%%0"))
+end
+
+-- Exact word match, case-insensitive: "ginv" matches "GINV pls" and "ginv!" but not "ginvite".
+local function MatchesKeyword(text)
+    local lower = text:lower()
+    for keyword in Settings().keywords:gmatch("[^,]+") do
+        keyword = strtrim(keyword):lower()
+        if keyword ~= "" and lower:find("%f[%w]" .. EscapePattern(keyword) .. "%f[%W]") then
+            return true
+        end
+    end
+    return false
+end
+
+local function Invite(target)
+    local invite = (C_GuildInfo and C_GuildInfo.Invite) or GuildInvite
+    invite(target)
+end
+
+function AutoInvite:GetQueue()
+    return queue
+end
+
+function AutoInvite:Notify()
+    if GRB.InviteFrame then
+        GRB.InviteFrame:Update()
+    end
+end
+
+function AutoInvite:OnToggled(enabled)
+    if not enabled then
+        wipe(queue)
+        self:Notify()
+    elseif not CanGuildInvite() then
+        GRB:Print(L["You do not have permission to invite players to the guild."])
+    end
+end
+
+-- Returns true, or false and a reason when the whisper must not produce an invite request.
+function AutoInvite:Evaluate(key, class, level)
+    local settings = Settings()
+    if GRB.Contacts:IsInGuild(key) then
+        return false, "in guild"
+    end
+    local contact = GRB.Contacts:Get(key)
+    if contact and contact.status == "do-not-contact" then
+        return false, "do-not-contact"
+    end
+
+    -- Allowed classes (none selected = every class). Unknown class cannot satisfy a restriction.
+    if next(settings.classes) and not settings.classes[class] then
+        return false, "class"
+    end
+
+    -- Minimum level. A whisper does not carry the level, so only known levels (from the contact
+    -- database) can be checked; unknown levels pass.
+    level = level or (contact and contact.level)
+    if settings.minLevel > 0 and level and level < settings.minLevel then
+        return false, "level"
+    end
+    return true
+end
+
+function AutoInvite:OnWhisper(_, text, sender, ...)
+    if not GRB:IsInviteEnabled() or not MatchesKeyword(text) then return end
+
+    local key = GRB.Contacts:Key(sender)
+    if not key then return end
+
+    -- Per-player cooldown so repeated "ginv" does not spam requests
+    local now = GetTime()
+    local last = lastRequest[key]
+    if last and now - last < Settings().cooldownMinutes * 60 then return end
+
+    for _, entry in ipairs(queue) do
+        if entry.key == key then return end
+    end
+
+    local guid = select(10, ...)
+    local localizedClass, token
+    if guid then
+        localizedClass, token = GetPlayerInfoByGUID(guid)
+    end
+
+    if not self:Evaluate(key, token) then return end
+
+    if not CanGuildInvite() then
+        if not warnedNoPermission then
+            warnedNoPermission = true
+            GRB:Print(L["You do not have permission to invite players to the guild."])
+        end
+        return
+    end
+
+    lastRequest[key] = now
+    local contact = GRB.Contacts:Get(key)
+    tinsert(queue, {
+        key = key,
+        target = GRB.Contacts:GetWhisperTarget(key),
+        class = localizedClass,
+        token = token,
+        level = contact and contact.level,
+    })
+
+    local sound = SOUNDKIT and SOUNDKIT.TELL_MESSAGE
+    if sound then PlaySound(sound) end
+    self:Notify()
+end
+
+-- Optional whisper sent right after the invite
+function AutoInvite:SendReply(entry)
+    local settings = Settings()
+    if not settings.replyEnabled then return end
+
+    local ctx = GRB.Messages:GetBaseContext()
+    ctx.name = (GRB.Contacts:SplitKey(entry.key))
+    ctx.class = entry.class or L["adventurer"]
+    ctx.level = entry.level
+    local result = GRB.Messages:Validate(settings.replyText, ctx)
+    if not result.ok or #result.unresolved > 0 or #result.unknown > 0 then
+        GRB:Print(L["Auto-reply skipped: the reply text is empty, too long or has unset placeholders."])
+        return
+    end
+
+    local ok, reason = GRB.Whisper:SendText(entry.key, result.rendered)
+    if not ok then
+        GRB:Print(format(L["Auto-reply skipped: %s"], reason))
+    end
+end
+
+-- Must be called from a click (hardware event). Invites the first queued player.
+function AutoInvite:AcceptNext()
+    local entry = tremove(queue, 1)
+    if not entry then return end
+
+    if not CanGuildInvite() then
+        GRB:Print(L["You do not have permission to invite players to the guild."])
+    elseif GRB.Contacts:IsInGuild(entry.key) then
+        GRB:Printf(L["%s is already in our guild."], entry.target)
+    else
+        Invite(entry.target)
+        GRB.Contacts:Record(entry.key, {
+            class = entry.class,
+            level = entry.level,
+            timestamp = GetServerTime(),
+            status = "invited",
+        })
+        GRB:Printf(L["Invited %s to the guild."], entry.target)
+        self:SendReply(entry)
+    end
+    self:Notify()
+end
+
+function AutoInvite:SkipNext()
+    tremove(queue, 1)
+    self:Notify()
+end
+
+function AutoInvite:OnEnable()
+    self:RegisterEvent("CHAT_MSG_WHISPER", "OnWhisper")
+end

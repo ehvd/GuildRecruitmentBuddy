@@ -93,3 +93,26 @@ L["Whisper cooldown (days)"] = true
 L["How long to wait before the same player can be whispered again. 0 disables the cooldown."] = true
 L["Max whispers per minute"] = true
 L["Session rate limit for whispers sent through the addon."] = true
+
+-- Auto invite
+L["Guild invite request"] = true
+L["Invite"] = true
+L["Skip"] = true
+L["Invite %s (%s, level %s)?"] = true
+L["%d more waiting"] = true
+L["Invited %s to the guild."] = true
+L["You do not have permission to invite players to the guild."] = true
+L["Invited you to {guild}! Accept the invite to join."] = true
+L["Auto-reply skipped: the reply text is empty, too long or has unset placeholders."] = true
+L["Auto-reply skipped: %s"] = true
+L["A keyword whisper queues an invite request. Click Invite in the popup to send it."] = true
+L["Enable auto invite"] = true
+L["Keywords (comma separated)"] = true
+L["Matched as an exact word, case-insensitive."] = true
+L["Minimum level (0 = off)"] = true
+L["Only applied when the level is known from the contacts; a whisper does not include it."] = true
+L["Allowed classes (none selected = all)"] = true
+L["Per-player cooldown (minutes)"] = true
+L["Repeated keywords from the same player are ignored for this long."] = true
+L["Whisper the player when the invite is sent"] = true
+L["Reply text"] = true

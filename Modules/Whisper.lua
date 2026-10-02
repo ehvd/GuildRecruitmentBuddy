@@ -23,6 +23,19 @@ function Whisper:CheckRateLimit()
     return true
 end
 
+-- Sends already rendered text as a whisper through ChatThrottleLib, honouring the session rate limit.
+-- Does not touch the contact database or its cooldown. Returns true, or false and a reason.
+function Whisper:SendText(name, text)
+    local key = GRB.Contacts:Key(name)
+    if not key then return false, L["Enter a player name."] end
+    local ok, reason = self:CheckRateLimit()
+    if not ok then return false, reason end
+
+    ChatThrottleLib:SendChatMessage("NORMAL", CTL_PREFIX, text, "WHISPER", nil, GRB.Contacts:GetWhisperTarget(key))
+    tinsert(sentTimes, GetTime())
+    return true
+end
+
 local function BuildContext(name, info)
     local ctx = GRB.Messages:GetBaseContext()
     ctx.name = (GRB.Contacts:SplitKey(GRB.Contacts:Key(name)))
@@ -73,8 +86,7 @@ function Whisper:Send(name, templateId, info)
     local text = GRB.Messages:Validate(template.text, BuildContext(name, info)).rendered
     local key = GRB.Contacts:Key(name)
 
-    ChatThrottleLib:SendChatMessage("NORMAL", CTL_PREFIX, text, "WHISPER", nil, GRB.Contacts:GetWhisperTarget(key))
-    tinsert(sentTimes, GetTime())
+    self:SendText(key, text)
 
     GRB.Contacts:Record(key, {
         class = info and info.class,
