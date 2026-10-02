@@ -8,3 +8,4 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ### Added
 - Project setup: repository, git flow, templates.
 - Documentation of Blizzard platform constraints (docs/CONSTRAINTS.md).
+- Lint workflow (luacheck) and `.luacheckrc`.
