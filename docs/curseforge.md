@@ -118,16 +118,6 @@ Recruiting works best when it doesn't feel like spam, and the addon is built to 
 
 ---
 
-## Roadmap
-
-Planned for future versions:
-
-- **Recruitment needs**: set which classes and roles you're looking for, and the scanner filters for them
-- **Recruitment statistics**: see which of your messages actually get replies
-- **Guild capacity warning** when you're close to the member cap
-
----
-
 ## Feedback & Bugs
 
 Found a bug or have an idea? Open an issue on [GitHub](https://github.com/ehvd/GuildRecruitmentBuddy/issues).

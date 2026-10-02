@@ -5,9 +5,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-02
+
 ### Added
 - Translations: French, German, Spanish (also used by Latin American clients) and Italian, following the language of the game client. The phrase lists for opt-out and lead detection and the default recruitment template come with each language (new profiles; existing profiles keep their current lists), and the opt-out / lead phrase lists keep the English phrases too.
 - `make locales` checks the translations (missing entries, broken `%s` / `{placeholders}`) and runs in CI; `make install LOCALE=deDE` shows the addon in another language on any client.
+
+### Changed
+- The CurseForge description no longer has a roadmap and lists the supported languages.
 
 ## [0.5.0] - 2026-10-02
 
@@ -71,7 +76,8 @@ First release (MVP) for WoW Classic Era.
 - Git flow repository, luacheck CI and tag-triggered CurseForge/GitHub releases (BigWigs packager).
 - Documentation of Blizzard platform constraints (`docs/CONSTRAINTS.md`).
 
-[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.5.0...develop
+[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.6.0...develop
+[0.6.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.2.0...v0.3.0
