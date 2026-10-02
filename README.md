@@ -20,7 +20,7 @@ a memory of who was already contacted, "ginv" auto-invite and a guildless-player
 ## Local development
 
 1. Install `luacheck` (e.g. `luarocks install luacheck`).
-2. Fetch the libraries into `GuildRecruitmentBuddy/Libs/` (gitignored):
+2. Fetch the libraries into `Libs/` (gitignored):
 
    ```powershell
    ./scripts/fetch-libs.ps1
@@ -29,7 +29,7 @@ a memory of who was already contacted, "ginv" auto-invite and a guildless-player
 3. Junction the addon into your WoW AddOns folder:
 
    ```powershell
-   cmd /c mklink /J "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddOns\GuildRecruitmentBuddy" "D:\Projects\WoW\GuildRecruitmentBuddy\GuildRecruitmentBuddy"
+   cmd /c mklink /J "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddOns\GuildRecruitmentBuddy" "D:\Projects\WoW\GuildRecruitmentBuddy"
    ```
 
 4. Run `/reload` in game after editing Lua.
