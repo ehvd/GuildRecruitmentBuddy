@@ -17,3 +17,4 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 - Tabbed main window (`/grb`) with the Messages tab; settings for the Discord link and guild name override.
 - Contacted-player database (shared across characters, keyed `Name-Realm`) with statuses, configurable whisper cooldown, guild-member skipping and automatic `replied` status.
 - Throttled whisper sending (ChatThrottleLib) with a per-session rate limit; Contacts tab with sortable/filterable list, status changes, delete, purge and a manual whisper box that shows why sending is disabled.
+- Auto guild invite: whispers containing a keyword (default `ginv`) queue an invite request shown in a click-to-invite popup (Blizzard requires a click for guild invites), with minimum level, allowed classes, do-not-contact and per-player cooldown rules and an optional auto-reply whisper. Off by default; toggle with `/grb invite on|off`, the minimap menu or settings.

@@ -43,7 +43,7 @@ read_globals = {
     -- Game API
     "C_Timer", "C_FriendList", "C_GuildInfo", "C_ChatInfo",
     "SendChatMessage", "GetGuildInfo", "GetNumGuildMembers", "GetGuildRosterInfo",
-    "GuildRoster", "IsInGuild", "CanGuildInvite", "GuildInvite", "GetRealmName", "GetNormalizedRealmName", "UnitName",
+    "GuildRoster", "IsInGuild", "CanGuildInvite", "GuildInvite", "GetRealmName", "GetPlayerInfoByGUID", "GetNormalizedRealmName", "UnitName",
     "UnitLevel", "UnitClass", "UnitFactionGroup", "GetServerTime", "GetTime", "GetLocale",
     "IsInInstance", "InCombatLockdown", "UnitIsAFK", "GetNumGroupMembers", "IsInRaid",
     "GetChannelList", "GetChannelName", "Ambiguate", "FlashClientIcon", "RAID_CLASS_COLORS",

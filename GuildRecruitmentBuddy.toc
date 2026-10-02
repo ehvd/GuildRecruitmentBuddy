@@ -17,7 +17,9 @@ Core.lua
 Modules\Messages.lua
 Modules\Contacts.lua
 Modules\Whisper.lua
+Modules\AutoInvite.lua
 
+UI\InviteFrame.lua
 UI\MainFrame.lua
 UI\MessagesTab.lua
 UI\ContactsTab.lua

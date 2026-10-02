@@ -15,6 +15,12 @@ local defaults = {
         minimap = { hide = false },
         autoInvite = {
             enabled = false,
+            keywords = "ginv",        -- comma separated, exact word, case-insensitive
+            minLevel = 0,               -- 0 = off; only applied when the player's level is known
+            classes = {},               -- [CLASS_TOKEN] = true; empty = every class
+            cooldownMinutes = 10,       -- ignore repeated keywords from the same player for this long
+            replyEnabled = false,
+            replyText = L["Invited you to {guild}! Accept the invite to join."],
         },
         guildName = "",   -- overrides the detected guild name for {guild}
         discord = "",     -- value of {discord}
@@ -47,6 +53,7 @@ function GRB:SetInviteEnabled(enabled)
     enabled = enabled and true or false
     self.db.profile.autoInvite.enabled = enabled
     self:Printf(L["Auto invite is now %s."], enabled and L["on"] or L["off"])
+    if self.AutoInvite then self.AutoInvite:OnToggled(enabled) end
     LibStub("AceConfigRegistry-3.0"):NotifyChange(ADDON_NAME)
 end
 

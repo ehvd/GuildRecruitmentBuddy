@@ -4,6 +4,7 @@ local L = GRB.L
 
 local function GetOptions()
     local db = GRB.db.profile
+    local invite = db.autoInvite
     return {
         type = "group",
         name = L["ADDON_NAME"],
@@ -13,13 +14,6 @@ local function GetOptions()
                 name = L["General"],
                 order = 1,
                 args = {
-                    autoInvite = {
-                        type = "toggle",
-                        name = L["Auto invite (ginv)"],
-                        order = 1,
-                        get = function() return GRB:IsInviteEnabled() end,
-                        set = function(_, value) GRB:SetInviteEnabled(value) end,
-                    },
                     minimap = {
                         type = "toggle",
                         name = L["Show minimap button"],
@@ -66,6 +60,87 @@ local function GetOptions()
                         width = "full",
                         get = function() return db.guildName end,
                         set = function(_, value) db.guildName = strtrim(value or "") end,
+                    },
+                },
+            },
+            autoInvite = {
+                type = "group",
+                name = L["Auto invite (ginv)"],
+                order = 2,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["A keyword whisper queues an invite request. Click Invite in the popup to send it."],
+                    },
+                    enabled = {
+                        type = "toggle",
+                        name = L["Enable auto invite"],
+                        order = 1,
+                        width = "full",
+                        get = function() return GRB:IsInviteEnabled() end,
+                        set = function(_, value) GRB:SetInviteEnabled(value) end,
+                    },
+                    keywords = {
+                        type = "input",
+                        name = L["Keywords (comma separated)"],
+                        desc = L["Matched as an exact word, case-insensitive."],
+                        order = 2,
+                        width = "full",
+                        get = function() return invite.keywords end,
+                        set = function(_, value) invite.keywords = strtrim(value or "") end,
+                    },
+                    minLevel = {
+                        type = "range",
+                        name = L["Minimum level (0 = off)"],
+                        desc = L["Only applied when the level is known from the contacts; a whisper does not include it."],
+                        order = 3,
+                        width = "full",
+                        min = 0, max = 60, step = 1,
+                        get = function() return invite.minLevel end,
+                        set = function(_, value) invite.minLevel = value end,
+                    },
+                    classes = {
+                        type = "multiselect",
+                        name = L["Allowed classes (none selected = all)"],
+                        order = 4,
+                        values = function()
+                            local values = {}
+                            for _, token in ipairs(GRB.AutoInvite.CLASSES) do
+                                values[token] = LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[token] or token
+                            end
+                            return values
+                        end,
+                        get = function(_, token) return invite.classes[token] or false end,
+                        set = function(_, token, value) invite.classes[token] = value or nil end,
+                    },
+                    cooldownMinutes = {
+                        type = "range",
+                        name = L["Per-player cooldown (minutes)"],
+                        desc = L["Repeated keywords from the same player are ignored for this long."],
+                        order = 5,
+                        width = "full",
+                        min = 1, max = 60, step = 1,
+                        get = function() return invite.cooldownMinutes end,
+                        set = function(_, value) invite.cooldownMinutes = value end,
+                    },
+                    replyEnabled = {
+                        type = "toggle",
+                        name = L["Whisper the player when the invite is sent"],
+                        order = 6,
+                        width = "full",
+                        get = function() return invite.replyEnabled end,
+                        set = function(_, value) invite.replyEnabled = value end,
+                    },
+                    replyText = {
+                        type = "input",
+                        name = L["Reply text"],
+                        desc = L["Placeholders: {name} {class} {level} {guild} {discord}"],
+                        order = 7,
+                        width = "full",
+                        multiline = 3,
+                        get = function() return invite.replyText end,
+                        set = function(_, value) invite.replyText = value or "" end,
                     },
                 },
             },
