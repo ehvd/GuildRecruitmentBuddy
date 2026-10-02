@@ -127,6 +127,7 @@ local function Build(container)
             counter:SetText("")
             warning:SetText("")
             preview:SetText("")
+            scroll:DoLayout()
             return
         end
 
@@ -146,6 +147,8 @@ local function Build(container)
         end
         warning:SetText(#notes > 0 and ("|cffffd100" .. table.concat(notes, "  ") .. "|r") or "")
         preview:SetText(result.rendered)
+        -- Labels start with zero height; re-layout so the rows below move down
+        scroll:DoLayout()
     end
 
     function widgets.RefreshList()

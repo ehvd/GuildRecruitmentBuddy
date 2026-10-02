@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Fixed
+- Overlapping text in the Messages tab preview (counter and warning labels) and the same label layout problem in the Contacts and Scanner tabs.
+
 ### Changed
 - Development tasks moved to a `Makefile` (`make libs`, `lint`, `install`, `link`, `uninstall`, `clean`), replacing `scripts/fetch-libs.ps1`.
 
