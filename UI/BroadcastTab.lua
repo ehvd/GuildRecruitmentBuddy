@@ -98,7 +98,7 @@ local function Build(container)
     local masterBox = AceGUI:Create("CheckBox")
     masterBox:SetLabel(L["Interval broadcasting enabled"])
     masterBox:SetValue(Broadcast:IsActive())
-    masterBox:SetRelativeWidth(0.6)
+    masterBox:SetRelativeWidth(0.68)
     masterBox:SetCallback("OnValueChanged", function(_, _, value)
         Broadcast:SetActive(value)
     end)
@@ -131,25 +131,25 @@ local function Build(container)
     local statusLabels = {}   -- entry id -> status label refreshed by the ticker
     local count = 0
 
-    for _, entry in ipairs(Broadcast:GetEntries()) do
+    for index, entry in ipairs(Broadcast:GetEntries()) do
         count = count + 1
         local id = entry.id
-        local msg = Broadcast:GetMessage(entry)
 
         local group = AceGUI:Create("InlineGroup")
-        group:SetTitle(msg and msg.name or L["(no message)"])
+        group:SetTitle(format(L["Broadcast %d"], index))
         group:SetLayout("Flow")
         group:SetFullWidth(true)
 
+        -- Row 1: what is sent, where and how often
         local messageDropdown = AceGUI:Create("Dropdown")
         messageDropdown:SetLabel(L["Message"])
-        messageDropdown:SetRelativeWidth(0.48)
+        messageDropdown:SetRelativeWidth(0.33)
         FillMessages(messageDropdown, entry)
         group:AddChild(messageDropdown)
 
         local channel = AceGUI:Create("Dropdown")
         channel:SetLabel(L["Channel"])
-        channel:SetRelativeWidth(0.48)
+        channel:SetRelativeWidth(0.33)
         FillChannels(channel, entry)
         group:AddChild(channel)
 
@@ -157,31 +157,31 @@ local function Build(container)
         interval:SetLabel(L["Every (minutes)"])
         interval:SetSliderValues(1, Broadcast.MAX_INTERVAL, 1)
         interval:SetValue(entry.interval)
-        interval:SetRelativeWidth(0.42)
+        interval:SetRelativeWidth(0.3)
         group:AddChild(interval)
 
+        -- Row 2: state and actions
         local active = AceGUI:Create("CheckBox")
         active:SetLabel(L["Active"])
         active:SetValue(entry.active)
-        active:SetRelativeWidth(0.22)
+        active:SetRelativeWidth(0.18)
         group:AddChild(active)
-
-        local remove = AceGUI:Create("Button")
-        remove:SetText(L["Remove"])
-        remove:SetRelativeWidth(0.26)
-        group:AddChild(remove)
 
         local status = AceGUI:Create("Label")
         status:SetText(StatusLine(entry))
-        status:SetRelativeWidth(0.7)
+        status:SetRelativeWidth(0.44)
         group:AddChild(status)
         statusLabels[id] = status
 
         local send = AceGUI:Create("Button")
         send:SetText(L["Send now"])
-        send:SetRelativeWidth(0.28)
+        send:SetRelativeWidth(0.18)
         group:AddChild(send)
 
+        local remove = AceGUI:Create("Button")
+        remove:SetText(L["Remove"])
+        remove:SetRelativeWidth(0.18)
+        group:AddChild(remove)
         local function Refresh()
             local current = Broadcast:GetEntry(id)
             if current then status:SetText(StatusLine(current)) end
