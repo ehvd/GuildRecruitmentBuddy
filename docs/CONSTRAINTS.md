@@ -1,0 +1,45 @@
+# Platform constraints
+
+Blizzard restricts what addons may automate. GuildRecruitmentBuddy is designed around these
+limits and never tries to bypass them. Verified against warcraft.wiki.gg (Classic Era 1.15.x,
+Interface `11509`) on 2026-10-02.
+
+## 1. Public channel messages need a hardware event
+
+`SendChatMessage` to `CHANNEL` (LookingForGroup, General, Trade, World) is "HW event restricted
+for both outdoors and indoors". `SAY`/`YELL` are restricted outdoors. Whispers are not restricted.
+Messages are truncated at 255 characters.
+
+**Design:** a timer may only mark a broadcast as *ready* (button highlight / sound); the user
+presses a keybind or button to actually send it. Never send channel messages from timers/events.
+
+Source: <https://warcraft.wiki.gg/wiki/API_SendChatMessage>
+
+## 2. `/who` needs a hardware event and is throttled
+
+`C_FriendList.SendWho` requires a hardware event ("as a measure against gold spam channel invites
+and other unintended uses"). The server applies a cooldown and does not guarantee a response;
+results arrive via `WHO_LIST_UPDATE` and are capped at 50 per query.
+
+**Design:** the scanner builds a queue of small class/level-slice queries; each click on
+"Next query" runs exactly one. Use `C_FriendList.SetWhoToUi` to keep the default `/who` UI quiet
+while scanning and restore it afterwards.
+
+Source: <https://warcraft.wiki.gg/wiki/API_C_FriendList.SendWho>
+
+## 3. Guild invites need a hardware event
+
+`C_GuildInfo.Invite` (alias `GuildInvite`) is marked `#hwevent` and exists in the Classic Era client.
+It cannot be called from an event handler such as `CHAT_MSG_WHISPER`.
+
+**Design:** a "ginv" whisper (or scanner row) enqueues an invite request; a popup/button
+("Invite Foo (Warrior 60)?") performs the invite on click. Always check `CanGuildInvite()` first.
+
+Source: <https://warcraft.wiki.gg/wiki/API_C_GuildInfo.Invite>
+
+## 4. Chat throttling
+
+All outgoing whispers go through ChatThrottleLib (bundled with Ace3) plus our own per-session
+rate limit. Spamming whispers can get a player silenced or reported.
+
+Source: <https://warcraft.wiki.gg/wiki/ChatThrottleLib>
