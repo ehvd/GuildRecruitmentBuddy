@@ -36,7 +36,7 @@ read_globals = {
     "UIParent", "GameTooltip", "StaticPopup_Show", "PlaySound", "PlaySoundFile", "SOUNDKIT",
     "InterfaceOptionsFrame_OpenToCategory", "Settings", "UIDropDownMenu_Initialize",
     "UIDropDownMenu_AddButton", "UIDropDownMenu_SetText", "UIDropDownMenu_SetWidth",
-    "UIDropDownMenu_CreateInfo", "ToggleDropDownMenu", "CloseDropDownMenus", "EasyMenu",
+    "UIDropDownMenu_CreateInfo", "ToggleDropDownMenu", "CloseDropDownMenus",
     "FauxScrollFrame_Update", "FauxScrollFrame_GetOffset", "FauxScrollFrame_OnVerticalScroll",
     "BackdropTemplateMixin", "GameFontNormal", "GameFontHighlight", "GameFontHighlightSmall",
     "PanelTemplates_SetNumTabs", "PanelTemplates_SetTab", "PanelTemplates_TabResize",
