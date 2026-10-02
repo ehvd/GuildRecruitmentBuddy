@@ -5,17 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-02
+
 ### Added
-- Broadcast tab: a list of broadcasts, each sending one channel message to one channel (dropdown of joined channels) at its own interval, with an active checkbox, live state and cooldown, Send now (sends immediately and restarts the timer) and Remove. Add several broadcasts to send the same message to multiple channels. A master on/off checkbox controls all of them, and the Broadcast ready popup has buttons to disable that broadcast or all broadcasting. The Messages tab is now only about writing the message templates.
+- Interval channel broadcasting, managed in the new Broadcast tab. Each broadcast sends one channel message to one channel (dropdown of the channels you have joined) at its own interval; add several broadcasts to send the same message to multiple channels. A timer marks a broadcast as ready and a popup, sound and key binding (`/grb send`) let you send it with the click Blizzard requires for channel messages. Each broadcast has an active checkbox, a live state and cooldown, Send now (sends immediately and restarts the timer) and Remove. Pauses in instances, combat and while AFK. Off by default; master switch in the tab, `/grb broadcast on|off`, the minimap menu or settings.
+- The "Broadcast ready" popup has buttons to disable the shown broadcast or all broadcasting, and a cogwheel that opens the Broadcast tab.
 - Opt-out detection: when a player you contacted replies with a configurable phrase (default: no thanks, not interested, stop, ...), they are marked do-not-contact automatically, with an optional chat notice. Single words only count at the start of a short reply and an exceptions list (default: no problem, no worries) avoids false positives.
-- Interval channel broadcasting: per-message channel and interval; a timer marks messages as ready and a popup, sound and key binding (`/grb send`) let you send them with the click Blizzard requires. Pauses in instances, combat and while AFK. Off by default; `/grb broadcast on|off`, minimap menu or settings.
+
+### Changed
+- The Messages tab is now only about writing message templates; channel, interval and on/off live in the Broadcast tab.
+- Development tasks moved to a `Makefile` (`make libs`, `lint`, `install`, `link`, `uninstall`, `clean`), replacing `scripts/fetch-libs.ps1`.
 
 ### Fixed
 - Right-click menu of the minimap button raised a Lua error because `EasyMenu` no longer exists in the client.
 - Overlapping text in the Messages tab preview (counter and warning labels) and the same label layout problem in the Contacts and Scanner tabs.
-
-### Changed
-- Development tasks moved to a `Makefile` (`make libs`, `lint`, `install`, `link`, `uninstall`, `clean`), replacing `scripts/fetch-libs.ps1`.
 
 ## [0.1.0] - 2026-10-02
 
@@ -34,5 +37,6 @@ First release (MVP) for WoW Classic Era.
 - Git flow repository, luacheck CI and tag-triggered CurseForge/GitHub releases (BigWigs packager).
 - Documentation of Blizzard platform constraints (`docs/CONSTRAINTS.md`).
 
-[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.1.0...develop
+[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.2.0...develop
+[0.2.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ehvd/GuildRecruitmentBuddy/releases/tag/v0.1.0
