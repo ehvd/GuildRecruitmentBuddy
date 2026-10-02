@@ -36,7 +36,7 @@ jobs:
           gh release upload "$GITHUB_REF_NAME" curseforge-description.md --clobber
           {
             echo "## CurseForge description for $GITHUB_REF_NAME"
-            echo "Paste this into the project description (also attached to the release as curseforge-description.md)."
+            echo "Paste this into the project description (https://authors.curseforge.com/#/projects/1722191/description). It is also attached to the release as curseforge-description.md."
             echo
             cat docs/curseforge.md
           } >> "$GITHUB_STEP_SUMMARY"
@@ -62,5 +62,5 @@ jobs:
             --body "docs/curseforge.md changed since ${previous:-the first release}. CurseForge cannot be updated by CI, so please paste it:
 
           1. Run \`make description\` (clipboard) or download \`curseforge-description.md\` from $RELEASE_URL
-          2. Paste it into the project description on CurseForge and save
+          2. Open the project description editor on CurseForge (https://authors.curseforge.com/#/projects/1722191/description), paste it and save
           3. Close this issue"
