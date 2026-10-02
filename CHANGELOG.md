@@ -6,11 +6,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ## [Unreleased]
 
 ### Added
+- Opt-out flow: when a player the addon whispered replies with an opt-out phrase such as "stop", a popup shows the message and asks whether to add the player to the do-not-contact list or skip. Adding sends one confirmation whisper ("Got it, you won't hear from me again...") and the addon never whispers the player again; a repeated "stop" gets no reply. The popup waits during quiet mode and can be switched off in Settings > Opt-out detection to add players automatically. The opt-out list is the account-wide do-not-contact list (keyed `Name-Realm`, with the GUID when known and the opt-out time), shared by the officer sync. `/grb optout list`, `add <name>` and `remove <name>` manage it by hand.
+- Every whisper the addon sends now goes through one gate that silently skips opted-out players and players with an open opt-out request (only the confirmation to a player who has just opted out passes it).
 - Scanner race filter: pick races of your own faction (none selected = all races); each selected race becomes its own `/who` query and combinations that cannot exist are skipped, with the usual splitting when a query returns a full page. The results show each player's race and can be filtered by it.
 
 ### Changed
 - The reminder issue to update the CurseForge description now contains the Markdown in a code block with a copy button, and older open reminder issues are closed automatically when a newer one is opened.
-
+- Opt-out phrases are only handled for players the addon itself whispered within the last 30 days; anyone else is ignored completely. New setting "Only invite players I have whispered" (off by default) in Settings > Auto invite does the same for "ginv".
+- Contacts that were last touched more than 30 days ago (or longer than the whisper cooldown) are pruned on load; opted-out players and guild members are always kept.
+- The default recruitment template asks "Looking for a guild?" and tells the player how to opt out; an unmodified copy of the old default is replaced once.
 ## [0.3.0] - 2026-10-02
 
 ### Added

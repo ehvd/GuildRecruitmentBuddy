@@ -23,16 +23,27 @@ function Whisper:CheckRateLimit()
     return true
 end
 
--- Sends already rendered text as a whisper through ChatThrottleLib, honouring the session rate limit.
--- Does not touch the contact database or its cooldown. Returns true, or false and a reason.
-function Whisper:SendText(name, text)
+-- THE place every whisper of the addon goes through (templates, replies, welcomes, opt-out confirmations):
+-- it silently refuses players on the opt-out list and honours the session rate limit, then sends through
+-- ChatThrottleLib. Does not touch the contact database or its cooldown.
+-- opts.ack is only for the one confirmation sent to a player who has just opted out: it is allowed to reach
+-- them and is not counted against the rate limit.
+-- Returns true, or false and a reason. An opted-out player returns false and no reason (nothing to tell the user).
+function Whisper:SendText(name, text, opts)
     local key = GRB.Contacts:Key(name)
     if not key then return false, L["Enter a player name."] end
-    local ok, reason = self:CheckRateLimit()
-    if not ok then return false, reason end
+    local ack = opts and opts.ack
+    -- An open opt-out request counts like an opt-out: no more recruitment whispers while the user decides
+    if not ack and (GRB.Contacts:IsOptedOut(key) or GRB.OptOut:IsPending(key)) then
+        return false
+    end
+    if not ack then
+        local ok, reason = self:CheckRateLimit()
+        if not ok then return false, reason end
+    end
 
     ChatThrottleLib:SendChatMessage("NORMAL", CTL_PREFIX, text, "WHISPER", nil, GRB.Contacts:GetWhisperTarget(key))
-    tinsert(sentTimes, GetTime())
+    if not ack then tinsert(sentTimes, GetTime()) end
     return true
 end
 
@@ -97,7 +108,8 @@ function Whisper:Send(name, templateId, info)
     local text = GRB.Messages:Validate(template.text, BuildContext(name, info)).rendered
     local key = GRB.Contacts:Key(name)
 
-    self:SendText(key, text)
+    local sent, why = self:SendText(key, text)
+    if not sent then return false, why end
 
     GRB.Contacts:Record(key, {
         class = info and info.class,
@@ -105,6 +117,7 @@ function Whisper:Send(name, templateId, info)
         timestamp = GetServerTime(),
         templateId = template.id,
         templateName = template.name,
+        whispered = GetServerTime(),
         status = "contacted",
     })
     return true

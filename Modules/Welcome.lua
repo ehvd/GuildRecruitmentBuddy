@@ -68,7 +68,7 @@ function Welcome:SendWelcome(key)
     if ok then
         if contact then contact.welcomed = GetServerTime() end
         GRB:Printf(L["Welcomed %s."], short)
-    else
+    elseif reason then
         GRB:Printf(L["Welcome message to %s skipped: %s"], short, reason)
     end
 end

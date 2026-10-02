@@ -27,6 +27,7 @@ Modules\Broadcast.lua
 
 UI\InviteFrame.lua
 UI\BroadcastFrame.lua
+UI\OptOutFrame.lua
 UI\MainFrame.lua
 UI\MessagesTab.lua
 UI\BroadcastTab.lua

@@ -42,7 +42,6 @@ L["Placeholders: {name} {class} {level} {guild} {discord}"] = true
 L["Preview"] = true
 L["New message"] = true
 L["Guild invite (whisper)"] = true
-L["Hi {name}! {guild} is looking for more {class}s. Want to join us? Discord: {discord}"] = true
 L["Delete message \"%s\"?"] = true
 L["Too long by %d characters."] = true
 L["Unknown placeholders: %s"] = true
@@ -175,7 +174,6 @@ L["When a player you contacted replies with one of these phrases, they are marke
 L["Enable opt-out detection"] = true
 L["Print a chat notice when a player opts out"] = true
 L["Opt-out phrases (comma separated)"] = true
-L["A single word only counts at the start of a short reply."] = true
 L["Exceptions (comma separated)"] = true
 L["Replies starting with one of these are never treated as an opt-out."] = true
 L["%s replied \"%s\": marked do-not-contact."] = true
@@ -256,3 +254,26 @@ L["Level and zone"] = true
 L["Show race"] = true
 L["All races"] = true
 L["None of the selected races can play the selected classes."] = true
+
+-- Opt-out flow
+L["Hi {name}! Looking for a guild? {guild} is a friendly community looking for more members. "
+    .. "Whisper \"ginv\" for an invite or ask me anything! "
+        .. "Sorry for the cold whisper; reply \"stop\" and I won't message you again."] = true
+L["Got it, you won't hear from me again. Good luck out there!"] = true
+L["Send a confirmation whisper when a player opts out"] = true
+L["Only invite players I have whispered"] = true
+L["Opted-out players: %d"] = true
+L["%s is now on the opt-out list."] = true
+L["%s was taken off the opt-out list."] = true
+L["%s is not on the opt-out list."] = true
+L["/grb optout list - show the players who opted out"] = true
+L["/grb optout add <name> - put a player on the opt-out list"] = true
+L["/grb optout remove <name> - take a player off the opt-out list"] = true
+L["A single word only counts at the start of a short reply."] = true
+L["When on, ginv from players you have not whispered (e.g. who answer channel posts) is ignored."] = true
+L["Ask before adding a player to the do-not-contact list"] = true
+L["A popup shows the message that triggered the request, with buttons to add the player or skip."] = true
+L["Opt-out request"] = true
+L["%s replied:"] = true
+L["Opt out"] = true
+L["%s asked to stop; decide on the opt-out request first."] = true

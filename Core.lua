@@ -24,6 +24,7 @@ local defaults = {
         minimap = { hide = false },
         autoInvite = {
             enabled = false,
+            onlyContacted = false,      -- true: only handle ginv from players the addon whispered
             keywords = "ginv",        -- comma separated, exact word, case-insensitive
             minLevel = 0,               -- 0 = off; only applied when the player's level is known
             classes = {},               -- [CLASS_TOKEN] = true; empty = every class
@@ -57,6 +58,8 @@ local defaults = {
         optOut = {
             enabled = true,         -- reply such as "not interested" marks a contacted player do-not-contact
             notify = true,          -- print a chat notice when that happens
+            confirm = true,         -- ask in a popup before adding a player to the do-not-contact list
+            ack = true,             -- send the player one confirmation whisper
             -- comma separated; a single word only counts at the start of a short reply
             phrases = "no, no thanks, no thx, not interested, stop, stop spamming, stop whispering, stop messaging, " ..
                 "leave me alone, dont whisper me, dont message me, remove me, unsubscribe",
@@ -117,6 +120,7 @@ end
 function GRB:OpenScanner()
     self.MainFrame:Open("Scanner")
 end
+
 function GRB:PrintUsage()
     self:Print(L["Usage:"])
     self:Print(L["/grb - open the main window"])
@@ -126,12 +130,15 @@ function GRB:PrintUsage()
     self:Print(L["/grb send - send the ready channel broadcast"])
     self:Print(L["/grb quiet on|off - switch quiet mode on or off by hand"])
     self:Print(L["/grb sync - force a full contact sync with the other recruiters"])
+    self:Print(L["/grb optout list - show the players who opted out"])
+    self:Print(L["/grb optout add <name> - put a player on the opt-out list"])
+    self:Print(L["/grb optout remove <name> - take a player off the opt-out list"])
     self:Print(L["/grb config - open settings"])
     self:Print(L["/grb options - open the Blizzard options panel"])
 end
 
 function GRB:HandleSlashCommand(input)
-    local cmd, arg = self:GetArgs(input or "", 2)
+    local cmd, arg, rest = self:GetArgs(input or "", 3)
     cmd = cmd and cmd:lower() or ""
     arg = arg and arg:lower() or nil
 
@@ -141,6 +148,8 @@ function GRB:HandleSlashCommand(input)
         self:SetInviteEnabled(arg == "on")
     elseif cmd == "broadcast" and (arg == "on" or arg == "off") then
         self.Broadcast:SetActive(arg == "on")
+    elseif cmd == "optout" then
+        self.OptOut:HandleCommand(arg, rest)
     elseif cmd == "sync" then
         self.Sync:ForceSync()
     elseif cmd == "quiet" and (arg == "on" or arg == "off") then

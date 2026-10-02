@@ -16,20 +16,31 @@ local function IsValidTarget(target)
     return false
 end
 
+-- The first default template of earlier versions; an unmodified copy is replaced once by the current default.
+local OLD_DEFAULT_TEXT = "Hi {name}! {guild} is looking for more {class}s. Want to join us? Discord: {discord}"
+
 function Messages:OnInitialize()
     local profile = GRB.db.profile
+    local defaultText = L["Hi {name}! Looking for a guild? {guild} is a friendly community looking for more members. "
+        .. "Whisper \"ginv\" for an invite or ask me anything! "
+        .. "Sorry for the cold whisper; reply \"stop\" and I won't message you again."]
+
     if not profile.messagesSeeded then
         profile.messagesSeeded = true
         if #profile.messages == 0 then
-            self:Add(
-                L["Guild invite (whisper)"],
-                "whisper",
-                L["Hi {name}! {guild} is looking for more {class}s. Want to join us? Discord: {discord}"]
-            )
+            self:Add(L["Guild invite (whisper)"], "whisper", defaultText)
+        end
+    end
+
+    if not profile.defaultTemplateUpdated then
+        profile.defaultTemplateUpdated = true
+        for _, msg in ipairs(profile.messages) do
+            if msg.text == OLD_DEFAULT_TEXT then
+                msg.text = defaultText
+            end
         end
     end
 end
-
 ---------------------------------------------------------------------------
 -- CRUD
 ---------------------------------------------------------------------------
