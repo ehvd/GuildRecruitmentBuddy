@@ -186,3 +186,19 @@ L["A single word only counts at the start of a short reply."] = true
 L["Exceptions (comma separated)"] = true
 L["Replies starting with one of these are never treated as an opt-out."] = true
 L["%s replied \"%s\": marked do-not-contact."] = true
+
+-- Broadcast tab
+L["Channel broadcasts"] = true
+L["Interval broadcasting enabled"] = true
+L["Channel messages are set up in the Messages tab. Send now sends immediately and restarts the timer."] = true
+L["No channel messages yet. Create one in the Messages tab (Send as: Channel message)."] = true
+L["Every"] = true
+L["State"] = true
+L["Next send"] = true
+L["Inactive"] = true
+L["Active"] = true
+L["Switched off"] = true
+L["Paused (%s)"] = true
+L["Ready"] = true
+L["%d min"] = true
+L["Send now"] = true

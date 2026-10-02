@@ -121,27 +121,44 @@ function Broadcast:OnMessageChanged(id, fields)
     self:Notify()
 end
 
--- Text for the status line of a message in the Messages tab
-function Broadcast:GetStatusText(id)
+-- State of a channel message. Returns one of
+--   "inactive"  the message is not set to broadcast
+--   "off"       it is, but broadcasting is switched off
+--   "paused"    broadcasting is paused (second return value: the reason)
+--   "ready"     it can be sent now
+--   "waiting"   cooling down (second return value: seconds until it is ready)
+function Broadcast:GetState(id)
     local msg = GRB.Messages:Get(id)
     if not msg or msg.target ~= "channel" or not msg.broadcast then
-        return ""
+        return "inactive"
     end
     if not self:IsActive() then
-        return L["Broadcasting is off (/grb broadcast on)."]
+        return "off"
     end
     local pause = self:GetPauseReason()
     if pause then
-        return format(L["Paused: %s."], pause)
-    end
-    if IsReady(id) then
-        return L["Ready to send."]
+        return "paused", pause
     end
     local due = nextDue[id]
-    if not due then
-        return L["Ready to send."]
+    if IsReady(id) or not due or GetTime() >= due then
+        return "ready"
     end
-    return format(L["Next one is ready in %d min."], max(1, ceil((due - GetTime()) / 60)))
+    return "waiting", due - GetTime()
+end
+
+-- Text for the status line of a message in the Messages tab
+function Broadcast:GetStatusText(id)
+    local state, extra = self:GetState(id)
+    if state == "off" then
+        return L["Broadcasting is off (/grb broadcast on)."]
+    elseif state == "paused" then
+        return format(L["Paused: %s."], extra)
+    elseif state == "ready" then
+        return L["Ready to send."]
+    elseif state == "waiting" then
+        return format(L["Next one is ready in %d min."], max(1, ceil(extra / 60)))
+    end
+    return ""
 end
 
 function Broadcast:Tick()
@@ -201,7 +218,16 @@ function Broadcast:SendNext()
         self:Notify()
         return false
     end
+    return self:SendMessage(msg.id)
+end
 
+-- Must be called from a keypress or click. Sends a channel message right now (even if it is not ready,
+-- inactive or broadcasting is paused) and restarts its timer.
+function Broadcast:SendMessage(id)
+    local msg = GRB.Messages:Get(id)
+    if not msg or msg.target ~= "channel" then return false end
+
+    RemoveReady(id)
     Reschedule(msg)
     self:Notify()
 
