@@ -195,16 +195,14 @@ function Broadcast:SetActive(active)
     self:Notify()
 end
 
--- Returns the reason broadcasting is paused right now, or nil.
+-- Returns the reason broadcasting is paused right now, or nil: quiet mode (combat, dungeon, raid, battleground)
+-- or AFK.
 function Broadcast:GetPauseReason()
-    local settings = Settings()
-    if settings.pauseInInstance and IsInInstance() then
-        return L["in an instance"]
+    local quiet = GRB.Quiet:GetReason()
+    if quiet then
+        return quiet
     end
-    if settings.pauseInCombat and (InCombatLockdown() or UnitAffectingCombat("player")) then
-        return L["in combat"]
-    end
-    if settings.pauseWhenAfk and UnitIsAFK("player") then
+    if Settings().pauseWhenAfk and UnitIsAFK("player") then
         return L["AFK"]
     end
 end
@@ -343,4 +341,5 @@ end
 
 function Broadcast:OnEnable()
     self:ScheduleRepeatingTimer("Tick", TICK)
+    GRB.Quiet:OnChange(function() self:Notify() end)
 end

@@ -8,6 +8,7 @@ local function GetOptions()
     local broadcast = db.broadcast
     local optOut = db.optOut
     local welcome = db.welcome
+    local quiet = db.quiet
     return {
         type = "group",
         name = L["ADDON_NAME"],
@@ -178,32 +179,17 @@ local function GetOptions()
                         get = function() return broadcast.sound end,
                         set = function(_, value) broadcast.sound = value end,
                     },
-                    pauseInInstance = {
-                        type = "toggle",
-                        name = L["Pause in instances, raids and battlegrounds"],
-                        order = 4,
-                        width = "full",
-                        get = function() return broadcast.pauseInInstance end,
-                        set = function(_, value) broadcast.pauseInInstance = value end,
-                    },
-                    pauseInCombat = {
-                        type = "toggle",
-                        name = L["Pause in combat"],
-                        order = 5,
-                        width = "full",
-                        get = function() return broadcast.pauseInCombat end,
-                        set = function(_, value) broadcast.pauseInCombat = value end,
-                    },
                     pauseWhenAfk = {
                         type = "toggle",
                         name = L["Pause while AFK"],
-                        order = 6,
+                        order = 4,
                         width = "full",
                         get = function() return broadcast.pauseWhenAfk end,
                         set = function(_, value) broadcast.pauseWhenAfk = value end,
                     },
                 },
-            },            optOut = {
+            },
+            optOut = {
                 type = "group",
                 name = L["Opt-out detection"],
                 order = 4,
@@ -285,6 +271,65 @@ local function GetOptions()
                         multiline = 3,
                         get = function() return welcome.text end,
                         set = function(_, value) welcome.text = value or "" end,
+                    },
+                },
+            },            quiet = {
+                type = "group",
+                name = L["Quiet mode"],
+                order = 6,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["Keeps recruiting out of the way: no broadcast popups, silent invite requests, held-back welcomes."],
+                    },
+                    enabled = {
+                        type = "toggle",
+                        name = L["Enable automatic quiet mode"],
+                        order = 1,
+                        width = "full",
+                        get = function() return quiet.enabled end,
+                        set = function(_, value)
+                            quiet.enabled = value
+                            GRB.Quiet:Refresh()
+                        end,
+                    },
+                    combat = {
+                        type = "toggle",
+                        name = L["In combat"],
+                        order = 2,
+                        width = "full",
+                        get = function() return quiet.combat end,
+                        set = function(_, value) quiet.combat = value; GRB.Quiet:Refresh() end,
+                    },
+                    dungeons = {
+                        type = "toggle",
+                        name = L["In dungeons"],
+                        order = 3,
+                        width = "full",
+                        get = function() return quiet.dungeons end,
+                        set = function(_, value) quiet.dungeons = value; GRB.Quiet:Refresh() end,
+                    },
+                    raids = {
+                        type = "toggle",
+                        name = L["In raids"],
+                        order = 4,
+                        width = "full",
+                        get = function() return quiet.raids end,
+                        set = function(_, value) quiet.raids = value; GRB.Quiet:Refresh() end,
+                    },
+                    battlegrounds = {
+                        type = "toggle",
+                        name = L["In battlegrounds and arenas"],
+                        order = 5,
+                        width = "full",
+                        get = function() return quiet.battlegrounds end,
+                        set = function(_, value) quiet.battlegrounds = value; GRB.Quiet:Refresh() end,
+                    },
+                    manual = {
+                        type = "description",
+                        order = 6,
+                        name = L["Switch quiet mode on by hand with /grb quiet on and off with /grb quiet off."],
                     },
                 },
             },            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),

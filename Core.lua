@@ -37,6 +37,14 @@ local defaults = {
             maxLevel = 60,
             zone = "",
         },
+        quiet = {                   -- see Modules/Quiet.lua
+            enabled = true,
+            combat = true,
+            dungeons = true,
+            raids = true,
+            battlegrounds = true,
+        },
+        quietMigrated = false,
         welcome = {
             enabled = false,        -- whisper new guild members (off by default)
             onlyRecruited = false,  -- only players that are in the contact database
@@ -56,8 +64,6 @@ local defaults = {
         broadcast = {
             active = false,         -- master switch, off by default (/grb broadcast on|off)
             sound = true,           -- sound when a broadcast becomes ready
-            pauseInInstance = true,
-            pauseInCombat = true,
             pauseWhenAfk = true,
         },
         window = {},      -- main window position and size (managed by AceGUI)
@@ -111,6 +117,7 @@ function GRB:PrintUsage()
     self:Print(L["/grb scan - open the scanner"])
     self:Print(L["/grb broadcast on|off - toggle interval broadcasting"])
     self:Print(L["/grb send - send the ready channel broadcast"])
+    self:Print(L["/grb quiet on|off - switch quiet mode on or off by hand"])
     self:Print(L["/grb config - open settings"])
     self:Print(L["/grb options - open the Blizzard options panel"])
 end
@@ -126,6 +133,8 @@ function GRB:HandleSlashCommand(input)
         self:SetInviteEnabled(arg == "on")
     elseif cmd == "broadcast" and (arg == "on" or arg == "off") then
         self.Broadcast:SetActive(arg == "on")
+    elseif cmd == "quiet" and (arg == "on" or arg == "off") then
+        self.Quiet:SetManual(arg == "on")
     elseif cmd == "send" then
         self.Broadcast:SendNext()
     elseif cmd == "scan" then

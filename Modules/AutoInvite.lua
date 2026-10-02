@@ -37,6 +37,11 @@ local function Invite(target)
     invite(target)
 end
 
+local function PlayCue()
+    local sound = SOUNDKIT and SOUNDKIT.TELL_MESSAGE
+    if sound then PlaySound(sound) end
+end
+
 function AutoInvite:GetQueue()
     return queue
 end
@@ -122,8 +127,10 @@ function AutoInvite:OnWhisper(_, text, sender, ...)
         level = contact and contact.level,
     })
 
-    local sound = SOUNDKIT and SOUNDKIT.TELL_MESSAGE
-    if sound then PlaySound(sound) end
+    -- Quiet mode: the request waits silently and the popup appears when it ends
+    if not GRB.Quiet:IsQuiet() then
+        PlayCue()
+    end
     self:Notify()
 end
 
@@ -180,4 +187,8 @@ end
 
 function AutoInvite:OnEnable()
     self:RegisterEvent("CHAT_MSG_WHISPER", "OnWhisper")
+    GRB.Quiet:OnChange(function(reason)
+        if not reason and #queue > 0 then PlayCue() end
+        self:Notify()
+    end)
 end

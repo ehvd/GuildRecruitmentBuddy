@@ -56,11 +56,11 @@ local function Create()
     frame:Hide()
 end
 
--- Shows the first queued request, or hides the popup when the queue is empty.
+-- Shows the first queued request, or hides the popup when the queue is empty or quiet mode is active.
 function InviteFrame:Update()
     local queue = GRB.AutoInvite:GetQueue()
     local entry = queue[1]
-    if not entry then
+    if not entry or GRB.Quiet:IsQuiet() then
         if frame then frame:Hide() end
         return
     end

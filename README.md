@@ -17,6 +17,7 @@ a memory of who was already contacted, "ginv" auto-invite and a guildless-player
 | `/grb scan` | Open the scanner tab |
 | `/grb broadcast on\|off` | Toggle interval broadcasting of channel messages |
 | `/grb send` | Send the ready channel broadcast (also a key binding) |
+| `/grb quiet on\|off` | Switch quiet mode (pauses recruiting popups and automation) on or off by hand |
 | `/grb config` | Open the Settings tab |
 | `/grb options` | Open the settings in Blizzard's Interface Options |
 

@@ -34,10 +34,15 @@ function MainFrame:SelectTab(key)
     end
 end
 
-function MainFrame:Create(key)
-    local frame = AceGUI:Create("Frame")
+-- Version, plus the quiet mode indicator while quiet mode is active
+function MainFrame:UpdateStatus(frame)
+    local reason = GRB.Quiet:GetReason()
+    frame:SetStatusText(reason and (GRB.version .. "   |cffffd100" .. format(L["Quiet mode: %s"], reason) .. "|r") or GRB.version)
+end
+
+function MainFrame:Create(key)    local frame = AceGUI:Create("Frame")
     frame:SetTitle(L["ADDON_NAME"])
-    frame:SetStatusText(GRB.version)
+    MainFrame:UpdateStatus(frame)
 
     -- Position and size are remembered in the profile
     local status = GRB.db.profile.window
@@ -104,3 +109,8 @@ function MainFrame:Toggle(key)
         self:Create(key)
     end
 end
+
+GRB.Quiet:OnChange(function()
+    if MainFrame.frame then MainFrame:UpdateStatus(MainFrame.frame) end
+end)
+
