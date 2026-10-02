@@ -124,7 +124,7 @@ Planned for future versions:
 - **Recruitment needs**: set which classes and roles you're looking for, and the scanner filters for them
 - **Recruitment statistics**: see which of your messages actually get replies
 - **Guild capacity warning** when you're close to the member cap
-- **Finnish localization**
+- **More languages**: French, Italian, German and Spanish
 
 ---
 
