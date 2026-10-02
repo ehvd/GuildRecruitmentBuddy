@@ -16,6 +16,11 @@ local defaults = {
         autoInvite = {
             enabled = false,
         },
+        guildName = "",   -- overrides the detected guild name for {guild}
+        discord = "",     -- value of {discord}
+        messages = {},    -- { id, name, target = "whisper"|"channel", text }
+        nextMessageId = 1,
+        messagesSeeded = false,
     },
     global = {
         contacts = {},

@@ -30,6 +30,23 @@ local function GetOptions()
                             GRB:UpdateMinimapButton()
                         end,
                     },
+                    discord = {
+                        type = "input",
+                        name = L["Discord link ({discord})"],
+                        order = 3,
+                        width = "full",
+                        get = function() return db.discord end,
+                        set = function(_, value) db.discord = strtrim(value or "") end,
+                    },
+                    guildName = {
+                        type = "input",
+                        name = L["Guild name override ({guild})"],
+                        desc = L["Leave empty to use the name of your current guild."],
+                        order = 4,
+                        width = "full",
+                        get = function() return db.guildName end,
+                        set = function(_, value) db.guildName = strtrim(value or "") end,
+                    },
                 },
             },
             profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),
