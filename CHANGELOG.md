@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Added
+- Leads: the addon keeps the last replies of players it contacted, and replies that sound interested but not ready (configurable phrases such as "maybe", "later", "tell me more"; opt-outs never count) turn the player into a **lead**. The new Leads tab lists every lead with the saved reply and its date, with follow-up Whisper, Invite and Remove buttons. Leads are never pruned or purged. Set one by hand with `/grb lead <name> [message]` or the Lead status in the Contacts tab; `/grb leads` opens the tab. Replies are stored locally and are not shared by the officer sync.
+
 ## [0.4.0] - 2026-10-02
 
 ### Added

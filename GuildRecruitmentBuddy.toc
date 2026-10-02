@@ -21,6 +21,7 @@ Modules\Whisper.lua
 Modules\AutoInvite.lua
 Modules\Scanner.lua
 Modules\OptOut.lua
+Modules\Leads.lua
 Modules\Welcome.lua
 Modules\Sync.lua
 Modules\Broadcast.lua
@@ -32,6 +33,7 @@ UI\MainFrame.lua
 UI\MessagesTab.lua
 UI\BroadcastTab.lua
 UI\ScannerTab.lua
+UI\LeadsTab.lua
 UI\ContactsTab.lua
 UI\Options.lua
 UI\Minimap.lua

@@ -277,3 +277,20 @@ L["Opt-out request"] = true
 L["%s replied:"] = true
 L["Opt out"] = true
 L["%s asked to stop; decide on the opt-out request first."] = true
+
+-- Leads
+L["Lead"] = true
+L["Leads"] = true
+L["%s replied \"%s\": saved as a lead."] = true
+L["Players who replied with interest. Their replies are kept here, and leads are never pruned or purged."] = true
+L["Follow-up message"] = true
+L["(no saved reply)"] = true
+L["No leads yet. Replies like \"maybe later\" or \"tell me more\" are saved here automatically."] = true
+L["Page %d / %d (%d leads)"] = true
+L["%s is now a lead."] = true
+L["/grb leads - open the leads"] = true
+L["/grb lead <name> [message] - save a player as a lead"] = true
+L["Replies from players you contacted that sound interested but not ready are kept as leads."] = true
+L["Save interested replies as leads"] = true
+L["Lead phrases (comma separated)"] = true
+L["A reply containing one of these words or phrases becomes a lead (opt-outs never do)."] = true

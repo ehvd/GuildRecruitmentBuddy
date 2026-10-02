@@ -36,7 +36,7 @@ Post your recruitment message to your chosen channels every few minutes, without
 ### 📒 Contact Memory
 Every whisper sent through the addon is remembered.
 
-- Tracks each player's status: contacted, replied, invited, joined, declined or do-not-contact
+- Tracks each player's status: contacted, replied, lead, invited, joined, declined or do-not-contact
 - Configurable cooldown (14 days by default) before the same player can be whispered again
 - Shared across all your characters
 - Sortable contact list with filters, status changes and cleanup tools
@@ -56,6 +56,13 @@ When a player you've whispered replies **`ginv`** (or any keyword you choose), G
 - Optional automatic reply when the invite goes out
 - Built-in cooldown, so repeated whispers don't trigger repeated invites
 - Off by default; toggle it with one command
+
+### 🌟 Leads
+A player answers *"not yet, maybe later :)"* and the reply is gone in the chat log a minute later. Guild Recruitment Buddy keeps what contacts write back, and replies that sound interested but not ready ("maybe", "later", "tell me more", ... your list) turn the player into a **lead**.
+
+- The **Leads** tab lists every lead with their saved reply and the date, with one-click follow-up whisper, invite or removal
+- Leads are never pruned or purged, so you can come back to them weeks later
+- Save one by hand with `/grb lead <name> [message]` or set the Lead status in the Contacts tab
 
 ### 👋 Welcome Messages
 When someone joins the guild, they're marked as joined and can get a welcome whisper with your Discord or website link. Off by default.
@@ -78,6 +85,8 @@ In combat, dungeons, raids and battlegrounds the addon keeps out of your way: no
 | `/grb broadcast on` / `off` | Toggle channel broadcasting |
 | `/grb send` | Send the ready channel broadcast (also a key binding) |
 | `/grb quiet on` / `off` | Switch quiet mode on or off by hand |
+| `/grb leads` | Open the leads |
+| `/grb lead <name> [message]` | Save a player as a lead |
 | `/grb optout list` / `add <name>` / `remove <name>` | Manage the opt-out list |
 | `/grb sync` | Force a full contact sync with other recruiters |
 | `/grb config` | Open settings |
