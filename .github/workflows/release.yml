@@ -73,8 +73,20 @@ jobs:
             printf '%s\n' "$(cat docs/curseforge.md)"
             echo "$fence"
           } > issue-body.md
-          gh issue create \
+          url=$(gh issue create \
             --title "Update the CurseForge description for $GITHUB_REF_NAME" \
             --assignee "$OWNER" \
             --label "type: docs" \
-            --body-file issue-body.md
+            --body-file issue-body.md)
+          echo "$url"
+          new=${url##*/}
+
+          # The newest text replaces the older reminders: close the ones that are still open
+          gh issue list --state open --label "type: docs" --limit 100 --json number,title \
+            --jq '.[] | select(.title | startswith("Update the CurseForge description for ")) | .number' |
+          while read -r number; do
+            if [ "$number" != "$new" ]; then
+              gh issue close "$number" --reason "not planned" \
+                --comment "Superseded by #$new, which has the newest description."
+            fi
+          done
