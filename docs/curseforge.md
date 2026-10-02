@@ -113,6 +113,7 @@ Recruiting works best when it doesn't feel like spam, and the addon is built to 
 ## Requirements
 
 - WoW Classic Era
+- English, French, German, Spanish or Italian game client (the addon follows the client language)
 - A guild rank with **invite permission** for the invite features and officer sync
 
 ---
@@ -124,7 +125,6 @@ Planned for future versions:
 - **Recruitment needs**: set which classes and roles you're looking for, and the scanner filters for them
 - **Recruitment statistics**: see which of your messages actually get replies
 - **Guild capacity warning** when you're close to the member cap
-- **More languages**: French, Italian, German and Spanish
 
 ---
 

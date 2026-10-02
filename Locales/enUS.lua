@@ -1,5 +1,35 @@
+local _, ns = ...
 local L = LibStub("AceLocale-3.0"):NewLocale("GuildRecruitmentBuddy", "enUS", true)
 if not L then return end
+
+-- The other languages (Locales/<code>.lua) fill this same table through ns.NewTranslation(code), which only
+-- returns a writer when <code> is the language of the client. Setting GRB_LOCALE_OVERRIDE (make install LOCALE=deDE)
+-- selects a language on any client, which AceLocale's own GAME_LOCALE cannot do reliably when another addon
+-- has already loaded AceLocale. Values left out of a translation fall back to English.
+function ns.NewTranslation(code)
+    local active = GRB_LOCALE_OVERRIDE or GetLocale()
+    if active == "enGB" then
+        active = "enUS"
+    elseif active == "esMX" then
+        active = "esES"
+    end
+    if code ~= active then return nil end
+
+    -- `L` above is AceLocale's write proxy for the default language, not the table the addon reads from, and it
+    -- refuses to overwrite values. Translations are written straight into the real registry table.
+    local registry = LibStub("AceLocale-3.0"):GetLocale("GuildRecruitmentBuddy")
+    return setmetatable({}, { __newindex = function(_, key, value) rawset(registry, key, value) end })
+end
+
+-- Defaults that depend on the language (a translation lists the English phrases too: players often answer in English)
+L["DEFAULT_OPTOUT_PHRASES"] = "no, no thanks, no thx, not interested, stop, stop spamming, stop whispering, stop messaging, "
+    .. "leave me alone, dont whisper me, dont message me, remove me, unsubscribe"
+L["DEFAULT_OPTOUT_EXCEPTIONS"] = "no problem, no worries"
+L["DEFAULT_LEAD_PHRASES"] = "maybe, later, interested, thinking about it, tell me more, not yet, sounds good, sounds interesting, "
+    .. "what time, what do you raid, how many"
+L["DEFAULT_RECRUITMENT_TEMPLATE"] = "Hi {name}! Looking for a guild? {guild} is a friendly community looking for more members. "
+    .. "Whisper \"ginv\" for an invite or ask me anything! "
+    .. "Sorry for the cold whisper; reply \"stop\" and I won't message you again."
 
 L["ADDON_NAME"] = "Guild Recruitment Buddy"
 L["Open window"] = true
@@ -256,9 +286,7 @@ L["All races"] = true
 L["None of the selected races can play the selected classes."] = true
 
 -- Opt-out flow
-L["Hi {name}! Looking for a guild? {guild} is a friendly community looking for more members. "
-    .. "Whisper \"ginv\" for an invite or ask me anything! "
-        .. "Sorry for the cold whisper; reply \"stop\" and I won't message you again."] = true
+
 L["Got it, you won't hear from me again. Good luck out there!"] = true
 L["Send a confirmation whisper when a player opts out"] = true
 L["Only invite players I have whispered"] = true

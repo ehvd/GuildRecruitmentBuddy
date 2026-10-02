@@ -58,8 +58,7 @@ local defaults = {
         },
         leads = {                   -- see Modules/Leads.lua
             enabled = true,         -- keep replies like "maybe later" as leads
-            phrases = "maybe, later, interested, thinking about it, tell me more, not yet, sounds good, sounds interesting, " ..
-                "what time, what do you raid, how many",
+            phrases = L["DEFAULT_LEAD_PHRASES"],
         },
         optOut = {
             enabled = true,         -- reply such as "not interested" marks a contacted player do-not-contact
@@ -67,9 +66,8 @@ local defaults = {
             confirm = true,         -- ask in a popup before adding a player to the do-not-contact list
             ack = true,             -- send the player one confirmation whisper
             -- comma separated; a single word only counts at the start of a short reply
-            phrases = "no, no thanks, no thx, not interested, stop, stop spamming, stop whispering, stop messaging, " ..
-                "leave me alone, dont whisper me, dont message me, remove me, unsubscribe",
-            exceptions = "no problem, no worries",   -- replies starting with these are never an opt-out
+            phrases = L["DEFAULT_OPTOUT_PHRASES"],
+            exceptions = L["DEFAULT_OPTOUT_EXCEPTIONS"],   -- replies starting with these are never an opt-out
         },
         broadcastEntries = {},      -- see Modules/Broadcast.lua: { id, messageId, channel, interval, active }
         nextBroadcastId = 1,
