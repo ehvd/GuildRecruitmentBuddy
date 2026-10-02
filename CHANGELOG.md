@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-02
+
 ### Added
 - Opt-out flow: when a player the addon whispered replies with an opt-out phrase such as "stop", a popup shows the message and asks whether to add the player to the do-not-contact list or skip. Adding sends one confirmation whisper ("Got it, you won't hear from me again...") and the addon never whispers the player again; a repeated "stop" gets no reply. The popup waits during quiet mode and can be switched off in Settings > Opt-out detection to add players automatically. The opt-out list is the account-wide do-not-contact list (keyed `Name-Realm`, with the GUID when known and the opt-out time), shared by the officer sync. `/grb optout list`, `add <name>` and `remove <name>` manage it by hand.
 - Every whisper the addon sends now goes through one gate that silently skips opted-out players and players with an open opt-out request (only the confirmation to a player who has just opted out passes it).
@@ -15,6 +17,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 - Opt-out phrases are only handled for players the addon itself whispered within the last 30 days; anyone else is ignored completely. New setting "Only invite players I have whispered" (off by default) in Settings > Auto invite does the same for "ginv".
 - Contacts that were last touched more than 30 days ago (or longer than the whisper cooldown) are pruned on load; opted-out players and guild members are always kept.
 - The default recruitment template asks "Looking for a guild?" and tells the player how to opt out; an unmodified copy of the old default is replaced once.
+
 ## [0.3.0] - 2026-10-02
 
 ### Added
@@ -58,7 +61,8 @@ First release (MVP) for WoW Classic Era.
 - Git flow repository, luacheck CI and tag-triggered CurseForge/GitHub releases (BigWigs packager).
 - Documentation of Blizzard platform constraints (`docs/CONSTRAINTS.md`).
 
-[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.3.0...develop
+[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.4.0...develop
+[0.4.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ehvd/GuildRecruitmentBuddy/releases/tag/v0.1.0
