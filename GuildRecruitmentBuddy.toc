@@ -36,4 +36,5 @@ UI\ScannerTab.lua
 UI\LeadsTab.lua
 UI\ContactsTab.lua
 UI\Options.lua
+UI\ContextMenu.lua
 UI\Minimap.lua

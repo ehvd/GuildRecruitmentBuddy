@@ -57,6 +57,9 @@ When a player you've whispered replies **`ginv`** (or any keyword you choose), G
 - Built-in cooldown, so repeated whispers don't trigger repeated invites
 - Off by default; toggle it with one command
 
+### 👆 Right-click Recruiting
+See someone in chat, in your group or on your friends list who might fit? **Right-click their name**, open **GRB > Recruit** and pick a whisper template. It goes out through the normal safety checks: cooldown, do-not-contact list and rate limit all apply, and the menu tells you why when a player can't be whispered right now.
+
 ### 🌟 Leads
 A player answers *"not yet, maybe later :)"* and the reply is gone in the chat log a minute later. Guild Recruitment Buddy keeps what contacts write back, and replies that sound interested but not ready ("maybe", "later", "tell me more", ... your list) turn the player into a **lead**.
 
