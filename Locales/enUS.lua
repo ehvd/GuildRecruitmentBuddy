@@ -207,3 +207,4 @@ L["No broadcasts yet. Write a channel message in the Messages tab, then click Ad
 L["Disable this broadcast"] = true
 L["Disable broadcasting"] = true
 L["Broadcast disabled. You can enable it again in the Broadcast tab."] = true
+L["Broadcast settings"] = true
