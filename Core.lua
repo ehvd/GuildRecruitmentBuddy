@@ -37,6 +37,9 @@ local defaults = {
             maxLevel = 60,
             zone = "",
         },
+        sync = {                    -- officer sync, see Modules/Sync.lua
+            enabled = true,
+        },
         quiet = {                   -- see Modules/Quiet.lua
             enabled = true,
             combat = true,
@@ -77,6 +80,9 @@ local defaults = {
     },
     global = {
         contacts = {},
+        sync = {
+            last = {},              -- "Name-Realm" of a peer -> newest change time received from it
+        },
     },
 }
 
@@ -118,6 +124,7 @@ function GRB:PrintUsage()
     self:Print(L["/grb broadcast on|off - toggle interval broadcasting"])
     self:Print(L["/grb send - send the ready channel broadcast"])
     self:Print(L["/grb quiet on|off - switch quiet mode on or off by hand"])
+    self:Print(L["/grb sync - force a full contact sync with the other recruiters"])
     self:Print(L["/grb config - open settings"])
     self:Print(L["/grb options - open the Blizzard options panel"])
 end
@@ -133,6 +140,8 @@ function GRB:HandleSlashCommand(input)
         self:SetInviteEnabled(arg == "on")
     elseif cmd == "broadcast" and (arg == "on" or arg == "off") then
         self.Broadcast:SetActive(arg == "on")
+    elseif cmd == "sync" then
+        self.Sync:ForceSync()
     elseif cmd == "quiet" and (arg == "on" or arg == "off") then
         self.Quiet:SetManual(arg == "on")
     elseif cmd == "send" then
