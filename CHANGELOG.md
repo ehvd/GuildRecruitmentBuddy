@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Changed
+- The reminder issue to update the CurseForge description now contains the Markdown in a code block with a copy button, and older open reminder issues are closed automatically when a newer one is opened.
+
 ## [0.3.0] - 2026-10-02
 
 ### Added
