@@ -30,6 +30,15 @@ local function Create()
     frame.title:SetPoint("TOP", frame, "TOP", 0, -18)
     frame.title:SetText(L["Broadcast ready"])
 
+    -- Opens the Broadcast tab of the main window
+    frame.settings = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.settings:SetSize(70, 20)
+    frame.settings:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -16, -14)
+    frame.settings:SetText(L["Settings"])
+    frame.settings:SetScript("OnClick", function()
+        GRB.MainFrame:Open("Broadcast")
+    end)
+
     frame.text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.text:SetPoint("TOP", frame.title, "BOTTOM", 0, -8)
     frame.text:SetWidth(300)
