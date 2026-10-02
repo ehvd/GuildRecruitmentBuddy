@@ -31,6 +31,7 @@ local defaults = {
             maxLevel = 60,
             zone = "",
         },
+        window = {},      -- main window position and size (managed by AceGUI)
         guildName = "",   -- overrides the detected guild name for {guild}
         discord = "",     -- value of {discord}
         messages = {},    -- { id, name, target = "whisper"|"channel", text }
@@ -66,29 +67,21 @@ function GRB:SetInviteEnabled(enabled)
     LibStub("AceConfigRegistry-3.0"):NotifyChange(ADDON_NAME)
 end
 
--- The tabbed main window is provided by UI/MainFrame.lua once it exists.
+-- The tabbed main window lives in UI/MainFrame.lua; tabs register themselves with it.
 function GRB:ToggleMainWindow(tab)
-    if self.MainFrame and self.MainFrame.Toggle then
-        self.MainFrame:Toggle(tab)
-    else
-        self:Print(L["The main window is not available yet."])
-    end
+    self.MainFrame:Toggle(tab)
 end
 
 function GRB:OpenScanner()
-    if self.MainFrame and self.MainFrame.Toggle then
-        self.MainFrame:Toggle("Scanner")
-    else
-        self:Print(L["Scanner is not available yet."])
-    end
+    self.MainFrame:Open("Scanner")
 end
-
 function GRB:PrintUsage()
     self:Print(L["Usage:"])
     self:Print(L["/grb - open the main window"])
     self:Print(L["/grb invite on|off - toggle keyword auto invite"])
     self:Print(L["/grb scan - open the scanner"])
     self:Print(L["/grb config - open settings"])
+    self:Print(L["/grb options - open the Blizzard options panel"])
 end
 
 function GRB:HandleSlashCommand(input)
@@ -102,8 +95,10 @@ function GRB:HandleSlashCommand(input)
         self:SetInviteEnabled(arg == "on")
     elseif cmd == "scan" then
         self:OpenScanner()
-    elseif cmd == "config" or cmd == "options" or cmd == "settings" then
+    elseif cmd == "config" or cmd == "settings" then
         self:OpenConfig()
+    elseif cmd == "options" then
+        self:OpenBlizzardOptions()
     else
         self:PrintUsage()
     end

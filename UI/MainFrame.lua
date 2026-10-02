@@ -38,8 +38,12 @@ function MainFrame:Create(key)
     local frame = AceGUI:Create("Frame")
     frame:SetTitle(L["ADDON_NAME"])
     frame:SetStatusText(GRB.version)
-    frame:SetWidth(720)
-    frame:SetHeight(540)
+
+    -- Position and size are remembered in the profile
+    local status = GRB.db.profile.window
+    status.width = status.width or 720
+    status.height = status.height or 540
+    frame:SetStatusTable(status)
     frame:SetLayout("Fill")
     frame:SetCallback("OnClose", function(widget)
         MainFrame:CleanupCurrent()
@@ -76,6 +80,17 @@ function MainFrame:Create(key)
     end
 
     self:SelectTab(key)
+end
+
+-- Opens the window on the given tab (or keeps it open), never closes it.
+function MainFrame:Open(key)
+    if self.frame then
+        if key and self.tabs[key] then
+            self:SelectTab(key)
+        end
+    else
+        self:Create(key)
+    end
 end
 
 function MainFrame:Toggle(key)
