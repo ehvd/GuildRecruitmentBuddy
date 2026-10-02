@@ -123,6 +123,11 @@ lint: ## Run luacheck
 
 locales: ## Check the translations in Locales/ against enUS.lua (STRICT=1 also fails on missing ones)
 	@awk -v base=Locales/enUS.lua -v strict="$(STRICT)" "$$CHECK_LOCALES" Locales/enUS.lua $(filter-out Locales/enUS.lua,$(wildcard Locales/*.lua))
+	@# Every L["..."] used by the code must exist in enUS.lua (AceLocale raises an error for missing keys)
+	@grep -rhoE 'L\["([^"\\]|\\.)*"\]' --include=*.lua Core.lua Modules UI | sed -E 's/^L\["//; s/"\]$$//' | sort -u > .used-keys.tmp
+	@grep -hoE '^L\["([^"\\]|\\.)*"\]' Locales/enUS.lua | sed -E 's/^L\["//; s/"\]$$//' | sort -u > .defined-keys.tmp
+	@missing=$$(comm -23 .used-keys.tmp .defined-keys.tmp); rm -f .used-keys.tmp .defined-keys.tmp; \
+	if [ -n "$$missing" ]; then echo "Keys used in code but missing from Locales/enUS.lua:"; echo "$$missing" | sed 's/^/  /'; exit 1; fi
 
 check-addon-dir:
 	@test -d "$(ADDON_DIR)" || { \
