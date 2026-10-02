@@ -51,13 +51,13 @@ local function Build(container)
     -- Selector row ---------------------------------------------------------
     local selector = AceGUI:Create("Dropdown")
     selector:SetLabel(L["Message"])
-    selector:SetRelativeWidth(0.48)
+    selector:SetRelativeWidth(0.44)
     scroll:AddChild(selector)
 
     local function AddButton(text, onClick)
         local button = AceGUI:Create("Button")
         button:SetText(text)
-        button:SetRelativeWidth(0.13)
+        button:SetRelativeWidth(0.12)
         button:SetCallback("OnClick", onClick)
         scroll:AddChild(button)
         return button
