@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-02
+
 ### Added
 - Officer sync: guild members who can invite and use the addon share the contact list automatically so two recruiters never whisper the same player. Each client announces itself on the guild addon channel only when it has invite permission and only accepts data from clients that did the same; the contacts travel as direct addon whispers. The newest change wins (do-not-contact wins a tie), catching up after login is incremental, and `/grb sync` or Settings > Officer sync forces a full resync. Deleting or purging contacts stays local.
 - Quiet mode: recruiting stays out of the way in combat, dungeons, raids and battlegrounds (each switchable in Settings > Quiet mode) or when switched on by hand with `/grb quiet on|off` or the minimap menu. Broadcasts are not marked ready and their popup is hidden, "ginv" requests are queued silently and the invite popup waits, welcome whispers are held back until it ends. The window status bar and the minimap button (greyed out) show when it is active. The combat/instance pause of broadcasting moved here from the broadcast settings.
@@ -46,6 +48,7 @@ First release (MVP) for WoW Classic Era.
 - Git flow repository, luacheck CI and tag-triggered CurseForge/GitHub releases (BigWigs packager).
 - Documentation of Blizzard platform constraints (`docs/CONSTRAINTS.md`).
 
-[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.2.0...develop
+[Unreleased]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.3.0...develop
+[0.3.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/ehvd/GuildRecruitmentBuddy/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ehvd/GuildRecruitmentBuddy/releases/tag/v0.1.0
