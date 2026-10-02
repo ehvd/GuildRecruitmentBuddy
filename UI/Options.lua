@@ -6,6 +6,7 @@ local function GetOptions()
     local db = GRB.db.profile
     local invite = db.autoInvite
     local broadcast = db.broadcast
+    local optOut = db.optOut
     return {
         type = "group",
         name = L["ADDON_NAME"],
@@ -199,6 +200,52 @@ local function GetOptions()
                         width = "full",
                         get = function() return broadcast.pauseWhenAfk end,
                         set = function(_, value) broadcast.pauseWhenAfk = value end,
+                    },
+                },
+            },            optOut = {
+                type = "group",
+                name = L["Opt-out detection"],
+                order = 4,
+                args = {
+                    description = {
+                        type = "description",
+                        order = 0,
+                        name = L["When a player you contacted replies with one of these phrases, they are marked do-not-contact."],
+                    },
+                    enabled = {
+                        type = "toggle",
+                        name = L["Enable opt-out detection"],
+                        order = 1,
+                        width = "full",
+                        get = function() return optOut.enabled end,
+                        set = function(_, value) optOut.enabled = value end,
+                    },
+                    notify = {
+                        type = "toggle",
+                        name = L["Print a chat notice when a player opts out"],
+                        order = 2,
+                        width = "full",
+                        get = function() return optOut.notify end,
+                        set = function(_, value) optOut.notify = value end,
+                    },
+                    phrases = {
+                        type = "input",
+                        name = L["Opt-out phrases (comma separated)"],
+                        desc = L["A single word only counts at the start of a short reply."],
+                        order = 3,
+                        width = "full",
+                        multiline = 4,
+                        get = function() return optOut.phrases end,
+                        set = function(_, value) optOut.phrases = value or "" end,
+                    },
+                    exceptions = {
+                        type = "input",
+                        name = L["Exceptions (comma separated)"],
+                        desc = L["Replies starting with one of these are never treated as an opt-out."],
+                        order = 4,
+                        width = "full",
+                        get = function() return optOut.exceptions end,
+                        set = function(_, value) optOut.exceptions = value or "" end,
                     },
                 },
             },            profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(GRB.db),

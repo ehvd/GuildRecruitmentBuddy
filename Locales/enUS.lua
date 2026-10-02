@@ -176,3 +176,14 @@ L["Play a sound when a broadcast is ready"] = true
 L["Pause in instances, raids and battlegrounds"] = true
 L["Pause in combat"] = true
 L["Pause while AFK"] = true
+
+-- Opt-out detection
+L["Opt-out detection"] = true
+L["When a player you contacted replies with one of these phrases, they are marked do-not-contact."] = true
+L["Enable opt-out detection"] = true
+L["Print a chat notice when a player opts out"] = true
+L["Opt-out phrases (comma separated)"] = true
+L["A single word only counts at the start of a short reply."] = true
+L["Exceptions (comma separated)"] = true
+L["Replies starting with one of these are never treated as an opt-out."] = true
+L["%s replied \"%s\": marked do-not-contact."] = true
