@@ -304,6 +304,9 @@ function Contacts:CanContact(name)
     if guildKeys[key] then
         return false, format(L["%s is already in our guild."], short)
     end
+    if GRB.OptOut:IsPending(key) then
+        return false, format(L["%s asked to stop; decide on the opt-out request first."], short)
+    end
 
     local contact = GRB.db.global.contacts[key]
     if not contact then return true end

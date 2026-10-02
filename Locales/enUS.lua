@@ -260,10 +260,8 @@ L["Hi {name}! Looking for a guild? {guild} is a friendly community looking for m
     .. "Whisper \"ginv\" for an invite or ask me anything! "
         .. "Sorry for the cold whisper; reply \"stop\" and I won't message you again."] = true
 L["Got it, you won't hear from me again. Good luck out there!"] = true
-L["A single word only counts when it is the whole reply."] = true
 L["Send a confirmation whisper when a player opts out"] = true
 L["Only invite players I have whispered"] = true
-L["Players who answer your channel posts with ginv are ignored while this is on."] = true
 L["Opted-out players: %d"] = true
 L["%s is now on the opt-out list."] = true
 L["%s was taken off the opt-out list."] = true
@@ -271,3 +269,11 @@ L["%s is not on the opt-out list."] = true
 L["/grb optout list - show the players who opted out"] = true
 L["/grb optout add <name> - put a player on the opt-out list"] = true
 L["/grb optout remove <name> - take a player off the opt-out list"] = true
+L["A single word only counts at the start of a short reply."] = true
+L["When on, ginv from players you have not whispered (e.g. who answer channel posts) is ignored."] = true
+L["Ask before adding a player to the do-not-contact list"] = true
+L["A popup shows the message that triggered the request, with buttons to add the player or skip."] = true
+L["Opt-out request"] = true
+L["%s replied:"] = true
+L["Add to do-not-contact list"] = true
+L["%s asked to stop; decide on the opt-out request first."] = true

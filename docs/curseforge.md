@@ -51,7 +51,7 @@ Everyone in your guild who can invite and runs the addon shares the same contact
 ### ✉️ Keyword Auto-Invite
 When a player you've whispered replies **`ginv`** (or any keyword you choose), Guild Recruitment Buddy queues the guild invite for one click.
 
-- By default only players the addon has whispered are handled, so strangers can't trigger invites (switch it off to also invite players who answer your channel posts)
+- Works for players who answer your channel posts too; optionally only for players the addon has whispered
 - Optional rules: minimum level, allowed classes, ignore players marked do-not-contact
 - Optional automatic reply when the invite goes out
 - Built-in cooldown, so repeated whispers don't trigger repeated invites
@@ -61,7 +61,7 @@ When a player you've whispered replies **`ginv`** (or any keyword you choose), G
 When someone joins the guild, they're marked as joined and can get a welcome whisper with your Discord or website link. Off by default.
 
 ### 🙅 Opt-out Detection
-If a player you whispered replies **`stop`** (or `not interested`, `no thanks` and the like), they go on the opt-out list, get one polite confirmation whisper and are never whispered by the addon again. Replies from players the addon hasn't contacted are ignored. The phrase list is yours to edit, and `/grb optout list` / `add` / `remove` manage the list by hand. The opt-out list is account-wide and shared with your fellow recruiters through Officer Sync.
+If a player you whispered replies **`stop`** (or `not interested`, `no thanks` and the like), a popup shows their message and asks whether to add them to the opt-out list. If you do, they get one polite confirmation whisper and are never whispered by the addon again. Replies from players the addon hasn't contacted are ignored. The phrase list is yours to edit, and `/grb optout list` / `add` / `remove` manage the list by hand. The opt-out list is account-wide and shared with your fellow recruiters through Officer Sync.
 
 ### 🤫 Quiet Mode
 In combat, dungeons, raids and battlegrounds the addon keeps out of your way: no popups, silent invite requests, welcome whispers held back until you're free. Each context can be switched off, or switch quiet mode on by hand.

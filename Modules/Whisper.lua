@@ -33,7 +33,8 @@ function Whisper:SendText(name, text, opts)
     local key = GRB.Contacts:Key(name)
     if not key then return false, L["Enter a player name."] end
     local ack = opts and opts.ack
-    if not ack and GRB.Contacts:IsOptedOut(key) then
+    -- An open opt-out request counts like an opt-out: no more recruitment whispers while the user decides
+    if not ack and (GRB.Contacts:IsOptedOut(key) or GRB.OptOut:IsPending(key)) then
         return false
     end
     if not ack then

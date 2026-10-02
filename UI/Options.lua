@@ -88,7 +88,7 @@ local function GetOptions()
                     onlyContacted = {
                         type = "toggle",
                         name = L["Only invite players I have whispered"],
-                        desc = L["Players who answer your channel posts with ginv are ignored while this is on."],
+                        desc = L["When on, ginv from players you have not whispered (e.g. who answer channel posts) is ignored."],
                         order = 1.5,
                         width = "full",
                         get = function() return invite.onlyContacted end,
@@ -224,6 +224,15 @@ local function GetOptions()
                         get = function() return optOut.notify end,
                         set = function(_, value) optOut.notify = value end,
                     },
+                    confirm = {
+                        type = "toggle",
+                        name = L["Ask before adding a player to the do-not-contact list"],
+                        desc = L["A popup shows the message that triggered the request, with buttons to add the player or skip."],
+                        order = 2.2,
+                        width = "full",
+                        get = function() return optOut.confirm end,
+                        set = function(_, value) optOut.confirm = value end,
+                    },
                     ack = {
                         type = "toggle",
                         name = L["Send a confirmation whisper when a player opts out"],
@@ -235,7 +244,7 @@ local function GetOptions()
                     phrases = {
                         type = "input",
                         name = L["Opt-out phrases (comma separated)"],
-                        desc = L["A single word only counts when it is the whole reply."],
+                        desc = L["A single word only counts at the start of a short reply."],
                         order = 3,
                         width = "full",
                         multiline = 4,

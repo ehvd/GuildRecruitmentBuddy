@@ -24,7 +24,7 @@ local defaults = {
         minimap = { hide = false },
         autoInvite = {
             enabled = false,
-            onlyContacted = true,       -- only handle ginv from players the addon whispered
+            onlyContacted = false,      -- true: only handle ginv from players the addon whispered
             keywords = "ginv",        -- comma separated, exact word, case-insensitive
             minLevel = 0,               -- 0 = off; only applied when the player's level is known
             classes = {},               -- [CLASS_TOKEN] = true; empty = every class
@@ -58,6 +58,7 @@ local defaults = {
         optOut = {
             enabled = true,         -- reply such as "not interested" marks a contacted player do-not-contact
             notify = true,          -- print a chat notice when that happens
+            confirm = true,         -- ask in a popup before adding a player to the do-not-contact list
             ack = true,             -- send the player one confirmation whisper
             -- comma separated; a single word only counts at the start of a short reply
             phrases = "no, no thanks, no thx, not interested, stop, stop spamming, stop whispering, stop messaging, " ..

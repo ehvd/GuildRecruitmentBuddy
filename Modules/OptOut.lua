@@ -4,15 +4,20 @@ local L = GRB.L
 local OptOut = GRB:NewModule("OptOut", "AceEvent-3.0")
 GRB.OptOut = OptOut
 
--- A reply opts a player out only when
+-- A reply is treated as an opt-out request when
 --   * the addon itself whispered that player recently (Contacts:IsKeywordEligible); anyone else is ignored
 --     completely, so a stranger typing "stop" changes nothing and gets no reply, and
---   * the whole reply, trimmed and without punctuation, is one of the phrases (a single word such as "stop"
---     must be the entire reply: "stop" and "STOP!" match, "stop by later" and "don't stop" do not), or it
---     contains one of the multi-word phrases ("please stop spamming me").
--- The player goes on the opt-out list (do-not-contact), gets one confirmation whisper and, being no longer
--- contacted, gets no answer to a repeated "stop".
+--   * the reply, without punctuation, contains one of the multi-word phrases ("please stop spamming me") or
+--     starts with a single-word phrase in a short reply ("stop", "no thanks i'm good"; but not
+--     "no problem, I'll join", see the exceptions list).
+-- By default the request goes into a queue and a popup (UI/OptOutFrame.lua) shows the message that triggered it;
+-- the user adds the player to the do-not-contact list or skips it. With confirmation switched off the player
+-- is added at once. Adding a player sends one confirmation whisper; being no longer contacted, a repeated
+-- "stop" gets no reply.
+local SHORT_REPLY_WORDS = 3
+
 local parsedCache = {}   -- raw setting string -> { normalized phrases }
+local queue = {}         -- pending requests: { key, name, text, guid }
 
 local function Settings()
     return GRB.db.profile.optOut
@@ -64,14 +69,71 @@ function OptOut:Match(text)
         if StartsWith(message, exception) then return nil end
     end
 
+    local words = WordCount(message)
     for _, phrase in ipairs(ParsePhrases(settings.phrases)) do
         if WordCount(phrase) > 1 then
             if Contains(message, phrase) then return phrase end
-        elseif message == phrase then
+        elseif StartsWith(message, phrase) and words <= SHORT_REPLY_WORDS then
             return phrase
         end
     end
     return nil
+end
+
+---------------------------------------------------------------------------
+-- Pending requests (confirmation popup)
+---------------------------------------------------------------------------
+
+function OptOut:GetQueue()
+    return queue
+end
+
+-- true while the player has an opt-out request waiting for the user's decision
+function OptOut:IsPending(key)
+    for _, entry in ipairs(queue) do
+        if entry.key == key then return true end
+    end
+    return false
+end
+
+function OptOut:Notify()
+    if GRB.OptOutFrame then
+        GRB.OptOutFrame:Update()
+    end
+end
+
+local function PlayCue()
+    local sound = SOUNDKIT and SOUNDKIT.TELL_MESSAGE
+    if sound then PlaySound(sound) end
+end
+
+-- Puts the player on the opt-out list, tells the user and (unless switched off) sends the one confirmation whisper.
+function OptOut:Apply(entry)
+    local contacts = GRB.Contacts
+    if contacts:IsOptedOut(entry.key) then return end   -- already handled, e.g. by another recruiter's sync
+
+    contacts:OptOut(entry.key, entry.guid)
+    if Settings().notify then
+        GRB:Printf(L["%s replied \"%s\": marked do-not-contact."], entry.name, entry.text)
+    end
+    if Settings().ack then
+        GRB.Whisper:SendText(entry.key, L["Got it, you won't hear from me again. Good luck out there!"], { ack = true })
+    end
+end
+
+-- The popup's "Add to do-not-contact list" button
+function OptOut:ConfirmNext()
+    local entry = tremove(queue, 1)
+    if entry then
+        self:Apply(entry)
+    end
+    self:Notify()
+end
+
+-- The popup's "Skip" button: the player stays a normal contact
+function OptOut:SkipNext()
+    tremove(queue, 1)
+    self:Notify()
 end
 
 function OptOut:OnWhisper(_, text, sender, ...)
@@ -82,16 +144,33 @@ function OptOut:OnWhisper(_, text, sender, ...)
     -- Only players this addon whispered recently are handled; everyone else is ignored completely
     if not key or not contacts:IsKeywordEligible(key) then return end
 
-    local phrase = self:Match(text)
-    if not phrase then return end
+    if not self:Match(text) then return end
 
-    contacts:OptOut(key, (select(10, ...)))
-    if Settings().notify then
-        GRB:Printf(L["%s replied \"%s\": marked do-not-contact."], (contacts:SplitKey(key)), text)
+    local entry = {
+        key = key,
+        name = (contacts:SplitKey(key)),
+        text = text,
+        guid = (select(10, ...)),
+    }
+    if not Settings().confirm then
+        self:Apply(entry)
+        return
     end
-    if Settings().ack then
-        GRB.Whisper:SendText(key, L["Got it, you won't hear from me again. Good luck out there!"], { ack = true })
+
+    -- A player who answers again while the request is open just updates the shown message
+    for _, pending in ipairs(queue) do
+        if pending.key == key then
+            pending.text = text
+            self:Notify()
+            return
+        end
     end
+    tinsert(queue, entry)
+    -- Quiet mode: the request waits silently and the popup appears when it ends
+    if not GRB.Quiet:IsQuiet() then
+        PlayCue()
+    end
+    self:Notify()
 end
 
 -- /grb optout list | add <name> | remove <name>
@@ -129,4 +208,8 @@ end
 
 function OptOut:OnEnable()
     self:RegisterEvent("CHAT_MSG_WHISPER", "OnWhisper")
+    GRB.Quiet:OnChange(function(reason)
+        if not reason and #queue > 0 then PlayCue() end
+        self:Notify()
+    end)
 end
