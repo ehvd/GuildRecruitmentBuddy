@@ -270,6 +270,7 @@ L["Lead phrases (comma separated)"] = "Phrases de piste (séparées par des virg
 L["A reply containing one of these words or phrases becomes a lead (opt-outs never do)."] = "Une réponse contenant l'un de ces mots ou phrases devient une piste (jamais pour un refus)."
 L["GRB"] = "GRB"
 L["Recruit"] = "Recruter"
+L["Invite to guild"] = "Inviter dans la guilde"
 L["No whisper templates yet."] = "Aucun modèle de chuchotement pour l'instant."
 L["Add a Recruit entry to the right-click menu of players"] = "Ajouter une entrée Recruter au menu clic droit des joueurs"
 L["Right-click a name (chat, target, party, friends) to whisper a template to that player."] = "Faites un clic droit sur un nom (chat, cible, groupe, amis) pour chuchoter un modèle à ce joueur."
