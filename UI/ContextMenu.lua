@@ -46,6 +46,17 @@ local function SendTemplate(name, templateId, info)
     end
 end
 
+-- The click on the menu entry is the hardware event the guild invite needs
+local function InviteToGuild(name, info)
+    local key = GRB.Contacts:Key(name)
+    GRB.AutoInvite:InviteNow({
+        key = key,
+        target = GRB.Contacts:GetWhisperTarget(key),
+        class = info.class,
+        level = info.level,
+    })
+end
+
 -- Whispers the template only to a guildless player. When the guild is not known yet (a name from chat or the
 -- friends list) the player is looked up with /who first; the click on the menu entry is the hardware event that
 -- needs. Every /who answer is remembered, so the next menu already knows.
@@ -88,6 +99,16 @@ local function Modify(_, rootDescription, contextData)
 
     rootDescription:CreateDivider()
     rootDescription:CreateTitle(L["GRB"])
+
+    -- Inviting is a contact too: not offered to players who opted out (or are about to) and to those who cannot invite.
+    -- The whisper cooldown does not apply to it.
+    local key = contacts:Key(name)
+    if CanGuildInvite() and not contacts:IsOptedOut(key) and not GRB.OptOut:IsPending(key) then
+        rootDescription:CreateButton(L["Invite to guild"], function()
+            InviteToGuild(name, info)
+        end)
+        rootDescription:CreateDivider()
+    end
 
     -- When the player cannot be whispered right now say why instead of offering the templates
     local ok, reason = contacts:CanContact(name)

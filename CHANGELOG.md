@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 ## [Unreleased]
 
 ### Added
+- Right-click menu: an **Invite to guild** entry in the GRB section, above a divider and the Recruit submenu. It is shown to players who can invite and for guildless players who have not opted out; the click sends the guild invite and marks the player as invited.
 - Broadcast tab: every broadcast shows a preview of its message as it will be sent (`{guild}` and `{discord}` filled in), with warnings for unknown or unset placeholders and texts that are too long.
 
 ### Fixed

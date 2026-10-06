@@ -270,6 +270,7 @@ L["Lead phrases (comma separated)"] = "Frasi per gli interessati (separate da vi
 L["A reply containing one of these words or phrases becomes a lead (opt-outs never do)."] = "Una risposta con una di queste parole o frasi diventa un interessato (i rifiuti mai)."
 L["GRB"] = "GRB"
 L["Recruit"] = "Recluta"
+L["Invite to guild"] = "Invita nella gilda"
 L["No whisper templates yet."] = "Nessun modello di sussurro per ora."
 L["Add a Recruit entry to the right-click menu of players"] = "Aggiungi una voce Recluta al menu del clic destro dei giocatori"
 L["Right-click a name (chat, target, party, friends) to whisper a template to that player."] = "Clic destro su un nome (chat, bersaglio, gruppo, amici) per sussurrare un modello a quel giocatore."
